@@ -1,0 +1,23 @@
+{
+    "name": "saad/blue-legend-php",
+    "authors": [
+        {
+            "name": "saad",
+            "email": "rs.mailpro@gmail.com"
+        }
+    ],
+    "require": {
+      "phpmailer/phpmailer": "^5.2"
+    },
+    "autoload":{
+        "psr-4":{
+          "App\\":"src/",
+          "App\\Model\\":"src\\model/",
+          "App\\Traits\\":"src\\traits/",
+          "App\\Controller\\":"src\\controller/",
+          "Template\\":"template/",
+          "config\\":"conf/",
+          "lib\\":"lib/"
+        }
+      }
+}
