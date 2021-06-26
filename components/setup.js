@@ -1,4 +1,4 @@
-let root = "https://blue-legend.com"
+let root = "http://blue-legend.local/"
 
 export {
     root

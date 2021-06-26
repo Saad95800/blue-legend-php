@@ -192,8 +192,12 @@ class AppController extends Controller {
     
     public function uploadFilePdfAjax(){
 
-        $target_dir = "public/pages/web/";
-        $target_file = $target_dir . time() . '.pdf';
+        $upload_html = false;
+        $file_name = time();
+        mkdir("public/uploads/".$file_name, 0700);
+        mkdir("public/uploads/".$file_name."/html", 0700);
+        $target_dir = "public/uploads/".$file_name."/";
+        $target_file = $target_dir . $file_name . '.pdf';
 
         if($_FILES["file"]["type"] != 'application/pdf'){
             echo json_encode([
@@ -212,8 +216,24 @@ class AppController extends Controller {
             $msg = 'Fichier chargé avec succès !';
             $file = [
                 'file_name_pdf' => basename($_FILES["file"]["name"]),
-                'file_name_pdf_server' => $target_file
+                'file_name_pdf_server' => $file_name.'.pdf'
             ];
+
+            $file_name;
+
+            // debug('C:\Program Files\poppler-0.68.0\bin\pdftohtml -c -s "'.ROOT.$file_name.'.pdf" "'.ROOT.'\public\uploads\\'.$file_name.'\html\\'.$file_name.'.html"');
+            $r =  proc_open(
+                'C:\Program Files\poppler-0.68.0\bin\pdftohtml -c -s "'.ROOT.'\public\uploads\\'.$file_name.'\\'.$file_name.'.pdf" "'.ROOT.'\public\uploads\\'.$file_name.'\html\\'.$file_name.'.html"',
+                [],
+                $pipes,
+                null,
+                null,
+                ['bypass_shell' => true]
+            );
+            // if(gettype($result) == 'resource'){
+            //     $upload_html = true;
+            // }
+
         }
 
         echo json_encode([
@@ -221,6 +241,7 @@ class AppController extends Controller {
             'msg' => $msg,
             'file' => $file
         ]);
+
         die;
 
     }

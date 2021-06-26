@@ -82,10 +82,14 @@ export default class Text extends Component {
                     </div>;
       }else if(this.state.type_text == 'pdf'){
         console.log(this.state.texte);
-        let src = root+"/public/pages/web/viewer.html?file="+this.state.texte.file_name_server.replace('public/pages/web/', '');
+        /*let src = root+"/public/pages/web/viewer.html?file="+this.state.texte.file_name_server.replace('public/pages/web/', '');*/
+        let fns = this.state.texte.file_name_server.replace(".pdf", "")
+        console.log(fns)
+        // let src = root+'public/uploads/'+fns+"/"+this.state.texte.file_name_server; Affiche le PDF original
+        let src = root+'public/uploads/'+fns+"/html/"+fns+"-html.html";
         text = 
         <div>
-          <iframe 
+          <iframe
             className="iframe-pdf" 
             id="iframe-pdf" 
             data-textid={this.state.texte.id_text}
