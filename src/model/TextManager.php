@@ -164,8 +164,8 @@ class TextManager extends Model {
         try {
 
             $this->dbh->beginTransaction();
-            $sql = "INSERT INTO `bl_text`(`title_text`, `content_text`, `type_text`, `file_name`, `file_name_server`, `slug`, `fk_id_user`, `fk_id_category`, `created_at`, `updated_at`) 
-                    VALUES (:title_text, :content_text, :type_text, :file_name, :file_name_server, :slug, :fk_id_user, :fk_id_category, :created_at, :updated_at)";
+            $sql = "INSERT INTO `bl_text`(`title_text`, `content_text`, `type_text`, `file_name`, `file_name_server`, `slug`, `nb_page`, `fk_id_user`, `fk_id_category`, `created_at`, `updated_at`) 
+                    VALUES (:title_text, :content_text, :type_text, :file_name, :file_name_server, :slug, :nb_page, :fk_id_user, :fk_id_category, :created_at, :updated_at)";
 
             $req = $this->dbh->prepare($sql);
             $req->bindValue(':title_text', $data['title_text']);
@@ -174,6 +174,7 @@ class TextManager extends Model {
             $req->bindValue(':file_name', $data['file_name_pdf']);
             $req->bindValue(':file_name_server', $data['file_name_pdf_server']);
             $req->bindValue(':slug', $data['slug']);
+            $req->bindValue(':nb_page', $data['nb_page']);
             $req->bindValue(':fk_id_user', $data['id_user']);
             $req->bindValue(':fk_id_category', $data['id_category']);
             $req->bindValue(':created_at', time());
@@ -183,9 +184,11 @@ class TextManager extends Model {
                 return false;
             }
 
+            $id_text = $this->getLastInsertId();
             $this->dbh->commit();
 
-            return $result;
+            
+            return $id_text;
             
         } catch (PDOException $e) {
             $this->dbh->rollback();
@@ -227,6 +230,39 @@ class TextManager extends Model {
             $this->dbh->commit();
 
             return $newTextes;
+            
+        } catch (PDOException $e) {
+            $this->dbh->rollback();
+            return false;
+        }
+
+    }
+
+    public function saveAncreLigne($id_text, $id_ancre){
+
+        try {
+
+            $this->dbh->beginTransaction();
+
+            $sql = "UPDATE bl_text SET ancre_ligne = :id_ancre, active_page = :active_page WHERE id_text = :id_text";
+
+            $req = $this->dbh->prepare($sql);
+
+            $req->bindValue(':id_ancre', $_POST['id_ancre']);
+            $req->bindValue(':id_text', $_POST['id_text']);
+            $req->bindValue(':active_page', $_POST['active_page']);
+            
+            $result = $req->execute();
+
+            if ($result) {
+                $return = true;
+            }else{
+                $return = false;
+            }
+
+            $this->dbh->commit();
+
+            return $return;
             
         } catch (PDOException $e) {
             $this->dbh->rollback();

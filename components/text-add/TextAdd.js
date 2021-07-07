@@ -24,7 +24,9 @@ export default class TextAdd extends Component {
       file_name_pdf_server: '',
       view_pdf: false,
       inputFileTitle: 'Choisir un fichier',
-      text_link: ''
+      text_link: '',
+      file_html: '',
+      id_file: ''
     }
 
   }
@@ -100,6 +102,8 @@ export default class TextAdd extends Component {
     formdata.append('type_text', this.state.type_text)
     formdata.append('file_name_pdf', this.state.file_name_pdf)
     formdata.append('file_name_pdf_server', this.state.file_name_pdf_server)
+    formdata.append('file_html', this.state.file_html)
+    formdata.append('id_file', this.state.id_file)
     formdata.append('slug', slugify(this.state.wysiwyg_title))
 
     axios({
@@ -158,7 +162,9 @@ export default class TextAdd extends Component {
             file_name_pdf: response.data.file.file_name_pdf,
             view_pdf: true,
             inputFileTitle: response.data.file.file_name_pdf,
-            wysiwyg_title: response.data.file.file_name_pdf
+            wysiwyg_title: response.data.file.file_name_pdf,
+            file_html: response.data.file_html,
+            id_file: response.data.file.file_name_pdf_server.replace(".pdf", "")
         });
       }
 

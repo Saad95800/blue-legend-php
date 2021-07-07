@@ -114,7 +114,7 @@ class ExpressionManager extends Model {
                     VALUES (:french_value, :english_value, :created_at, :updated_at)";
 
             $req = $this->dbh->prepare($sql);
-            $req->bindValue(':french_value', $french_val);
+            $req->bindValue(':french_value', html_entity_decode($french_val) );
             $req->bindValue(':english_value', $english_val);
             $req->bindValue(':created_at', time());
             $req->bindValue(':updated_at', time());

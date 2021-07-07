@@ -130,7 +130,8 @@ class AppController extends Controller {
 
         $textContentArea = $this->textHoverWord([
             'textContent' => $texte['content_text'],
-            'recordexpressions' => $recordExpressions]);
+            'recordexpressions' => $recordExpressions
+        ]);
 
         $texte['textContentArea'] = $textContentArea;
 
@@ -168,7 +169,21 @@ class AppController extends Controller {
     public function saveTextAjax(){
 
         $tm = new TextManager();
+        // debug( file_exists(ROOT.'/public/uploads/60e455b2df007/html/60e455b2df007-1.html') );
+// debug(ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$_POST['id_file'].DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$_POST['id_file'].'-1.html');
+        $nbpage = 0;
+        for($i = 1; $i <= 2000; $i++){
+            if(!file_exists(ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$_POST['id_file'].DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$_POST['id_file'].'-'.$i.'.html')){
+                $nbpage = $i;
+                break;
+            }
+            $i++;
+        }
 
+
+        $nbpage = $nbpage - 2;
+
+        // debug($nbpage);
         $data = [
             'id_user' => $_SESSION['id_user'],
             'title_text' => $_POST['title_text'],
@@ -178,9 +193,61 @@ class AppController extends Controller {
             'file_name_pdf' => $_POST['file_name_pdf'],
             'file_name_pdf_server' => $_POST['file_name_pdf_server'],
             'slug' => $_POST['slug'],
+            'file_html' => $_POST['file_html'],
+            'nb_page' => $nbpage
         ];
 
-        $result = $tm->saveText($data);
+
+
+        $id_text = $tm->saveText($data);
+
+        if($id_text){
+
+            $links = '
+                <link rel="stylesheet" href="'.URLROOT.'/public/css/file.css" rel="stylesheet" />
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+                <script src="'.URLROOT.'/public/pages/web/jquery-2.2.2.min.js"></script>
+                <script src="'.URLROOT.'/public/js/file.js"></script>
+            ';
+            $add_html = '
+            <div id="id-text" style="display:none;"></div>
+            <div id="cal1">&nbsp;</div>
+            <div id="cal2">&nbsp;</div>
+            <div id="popupTrad" class="popup-trad">
+                <div class="arrow-popuptrad"></div>
+                <div id="translationPopupText" class="text-center">
+                  <div style="margin: 10px;font-weight:normal;display:none;" id="selText"></div>
+                  <div style="margin: 10px;font-size:1.2em;font-weight:bold;" id="frenchValue"></div>
+                </div>
+                <div class="display-flex-center">
+                  <div id="btnSaveExpression" class="display-flex-center" style="background-color: #6592ff"></div>
+                </div>
+            </div>
+            ';
+
+            for($i = 1; $i <= $nbpage; $i++){
+                $file_root = ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$_POST['id_file'].DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$_POST['id_file'].'-'.$i.'.html';
+                $texte = file_get_contents($file_root);
+                $texte = preg_replace('/\<\/head\>/', $links.'</head>', $texte, 1);
+                $texte = preg_replace('/\<\/body\>/', $add_html.'</body>', $texte, 1);
+                file_put_contents($file_root, $texte);                
+            }
+
+
+            // $em = new ExpressionManager();
+            // $recordExpressions = $em->getRecordExpressions($_SESSION['id_user'], $id_text);
+
+            // $texte = $this->textHoverWord([
+            //     'textContent' => $texte,
+            //     'recordexpressions' => $recordExpressions
+            // ]);
+            // debug($texte);
+        }
+
+        $resilt = false;
+        if(strlen($id_text) > 0){
+            $result = true;
+        }
 
         echo json_encode([
             'result' => $result
@@ -193,7 +260,7 @@ class AppController extends Controller {
     public function uploadFilePdfAjax(){
 
         $upload_html = false;
-        $file_name = time();
+        $file_name = uniqid();
         mkdir("public/uploads/".$file_name, 0700);
         mkdir("public/uploads/".$file_name."/html", 0700);
         $target_dir = "public/uploads/".$file_name."/";
@@ -222,24 +289,23 @@ class AppController extends Controller {
             $file_name;
 
             // debug('C:\Program Files\poppler-0.68.0\bin\pdftohtml -c -s "'.ROOT.$file_name.'.pdf" "'.ROOT.'\public\uploads\\'.$file_name.'\html\\'.$file_name.'.html"');
-            $r =  proc_open(
-                'C:\Program Files\poppler-0.68.0\bin\pdftohtml -c -s "'.ROOT.'\public\uploads\\'.$file_name.'\\'.$file_name.'.pdf" "'.ROOT.'\public\uploads\\'.$file_name.'\html\\'.$file_name.'.html"',
+            $process =  proc_open(
+                'C:\Program Files\poppler-0.68.0\bin\pdftohtml -c "'.ROOT.'\public\uploads\\'.$file_name.'\\'.$file_name.'.pdf" "'.ROOT.'\public\uploads\\'.$file_name.'\html\\'.$file_name.'.html"',
                 [],
                 $pipes,
                 null,
                 null,
                 ['bypass_shell' => true]
             );
-            // if(gettype($result) == 'resource'){
-            //     $upload_html = true;
-            // }
+        }   
 
-        }
+        $file_html = $target_dir . 'html/' . $file_name . '-1.html';
 
         echo json_encode([
             'result' => $result,
             'msg' => $msg,
-            'file' => $file
+            'file' => $file,
+            'file_html' => $file_html
         ]);
 
         die;
@@ -423,14 +489,11 @@ class AppController extends Controller {
         $id_serie = 0;
 
         if(count($series) == 0){
-            // var_dump('ici 1');
             // on crée une série et on récupère son id
             $id_serie = $em->createSerie('Serie '.(count($series)+1), $_POST['id_text'], $_SESSION['id_user']);
         }elseif(count($series) > 0){
-            // var_dump('ici 2');
             foreach($series as $serie){
                 if(count($serie['expressions']) < 5 ){
-                    // var_dump('ici 3');
                     $id_serie = $serie['id_serie'];
                     break;
                 }
@@ -438,8 +501,6 @@ class AppController extends Controller {
             if($id_serie == 0){
                 var_dump('ici 4');
                 // on crée une série et on récupère son id
-                // var_dump('Serie '.(count($series)+1));
-                // die('stop 1');
                 $id_serie = $em->createSerie('Serie '.(count($series)+1), $_POST['id_text'], $_SESSION['id_user']);
                 if(!$id_serie){
                     echo json_encode([
@@ -470,13 +531,35 @@ class AppController extends Controller {
         if($result){
             echo json_encode([
                 'error' => false, 
-                'msg' => 'Enregistrement effectuée avec succès',
+                'msg' => 'Enregistrement effectuée avec succès'
             ]);
             die;
         }
         echo json_encode([
             'error' => true, 
-            'msg' => 'Echec de l\'enregistrement en base de donnée',
+            'msg' => 'Echec de l\'enregistrement en base de donnée'
+        ]);
+        die;
+
+    }
+
+    public function SaveAncreLigne(){
+
+        $tm = new TextManager();
+
+        $result = $tm->saveAncreLigne($_POST['id_text'], $_POST['id_ancre'], $_POST['active_page']);
+
+        $error = true;
+        $msg = 'Echec de l\'enregistrement de l\'ancre';
+
+        if($result){
+            $error = false;
+            $msg = 'Enregistrement effectué avec succès !';
+        }
+
+        echo json_encode([
+            'error' => $error, 
+            'msg' => $msg
         ]);
         die;
 

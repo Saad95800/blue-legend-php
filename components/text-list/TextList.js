@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Row, Col, Button } from 'reactstrap';
 import {capitalizeFirstLetter} from './../functions';
+import {root} from './../setup'
 
 export default class TextList extends Component {
 
@@ -49,8 +50,9 @@ export default class TextList extends Component {
   }
     render() {
 
-      let textes = this.state.textes.map((texte, index) => {
+        let textes = this.state.textes.map((texte, index) => {
         let textTitle = texte.title_text.length > 20 ? texte.title_text.substring(0, 20)+'...' : texte.title_text;
+        let folder = texte.file_name_server.replace('.pdf', '')
         return  <div className="col-xs-4 col-sm-2" key={index}>
                   <Link
                     to={'/texte/'+texte.id_text}
@@ -58,7 +60,7 @@ export default class TextList extends Component {
                     <div key={index} className="list-hover-item">
                       <div className="display-flex-center" style={{textAlign: 'center', height: '40px'}}>{ capitalizeFirstLetter(textTitle) }</div>
                       <div style={{'textAlign': 'center'}}>
-                      <span className="img-item-liste-texte"></span>
+                      <span className="img-item-liste-texte" style={{background: 'url('+root+'/public/uploads/'+folder+'/html/'+folder+'001.png'+') no-repeat', backgroundSize: '100%'}}></span>
                       </div>
                     </div>
                   </Link>

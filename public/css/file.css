@@ -1,0 +1,118 @@
+img{
+    user-select: none;
+}
+/* body{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+} */
+.display-flex-center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.popup-trad{
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 25px 10px;
+    z-index: 3;
+    background-color: #fff;
+    min-width: 200px;
+    max-width: 300px;
+    min-height: 35px;
+    border: 2px solid #e6e6e6;
+    position: absolute;
+}
+.arrow-popuptrad{
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: -11px;
+    left: 90px;
+    background-color: #fff;
+    border-top: 1px solid #00000024;
+    border-left: 1px solid #00000024;
+    -ms-transform: rotate(45deg); /* IE 9 */
+    -webkit-transform: rotate(45deg); /* Safari */
+    transform: rotate(45deg);
+}
+.text-center{
+    text-align: center;
+}
+#btnSaveExpression{
+    width: 120px;
+    min-height: 45px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding: 0px 10px;
+    text-shadow: 1px 1px 1px black;
+    font-size: 20px;
+    margin-top: 25px;
+}
+#cal1{
+    position:absolute;
+    height:0px;
+    width:0px;
+    top:100px;
+    left:100px;
+    overflow:none;
+    z-index:-100;
+}
+#cal2{
+    position:absolute;
+    height:0px;
+    width:0px;
+    top:0px;
+    left:0px;
+    overflow:none;
+    z-index:-100;
+}
+.hover-word{
+    background-color: transparent;
+    border-bottom: 1px solid black;
+    padding: 3px;
+}
+.hover-word:hover{
+    background-color: rgb(240, 240, 240);
+    cursor: pointer;
+}
+.popup-hover-word{
+    display: inline-block;
+}
+.hover-word-french{
+    display: none;
+}
+#translationPopupText{
+    font-size: 20px;
+}
+.page-pdf{
+      margin-top: 20px;
+}
+body{
+    background-color: #f9f9ff;
+}
+.ancre-ligne{
+    background-color: #ffe999;
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+p::selection {
+    background: rgb(219, 246, 255);
+    color: rgb(97, 97, 97);
+}
+i::selection {
+    background: rgb(219, 246, 255);
+    color: rgb(97, 97, 97);
+}
+b::selection {
+    background: rgb(219, 246, 255);
+    color: rgb(97, 97, 97);
+}

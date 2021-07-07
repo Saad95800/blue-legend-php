@@ -2470,3 +2470,15 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
 #translationPopupText{
   font-size: 20px;
 }
+p::selection {
+  background: rgb(219, 246, 255);
+  color: rgb(97, 97, 97);
+}
+i::selection {
+    background: rgb(219, 246, 255);
+    color: rgb(97, 97, 97);
+}
+b::selection {
+    background: rgb(219, 246, 255);
+    color: rgb(97, 97, 97);
+}

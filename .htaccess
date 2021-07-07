@@ -45,6 +45,7 @@ RewriteRule ^save-dataserie$ index.php?controller=appController&method=saveDatas
 RewriteRule ^update-histoserie-ajax$ index.php?controller=appController&method=updateHistoserie [L]
 RewriteRule ^check-expression-exist-ajax$ index.php?controller=appController&method=checkExpressionExistAjax [L]
 RewriteRule ^save-expression-ajax$ index.php?controller=appController&method=SaveExpressionAjax [L]
+RewriteRule ^save-ancre-ligne$ index.php?controller=appController&method=SaveAncreLigne [L]
 
 # ACCUEIL
 #RewriteRule ^home$ index.php?controller=AccueilController&method=indexAction [L]
