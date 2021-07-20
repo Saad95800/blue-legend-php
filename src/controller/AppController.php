@@ -13,6 +13,29 @@ use \App\Traits\TextTrait;
 class AppController extends Controller {
     use TextTrait;
 
+    public function insertLogAjax(){
+
+        $comment = '';
+        if(isset($_POST['comment'])){
+            $comment = $_POST['comment'];
+        }
+        $result = $this->insertLog($_POST['page_log'], $_POST['id_type_log'], $comment);
+
+        $error = true;
+        $msg = 'Echec de l\'enregistrement';
+
+        if($result){
+            $error = false;
+            $msg = 'Enregistrement effectué avec succès';
+        }
+
+        echo json_encode([
+            'error' => $error,
+            'msg' => $msg
+        ]);
+        die;
+
+    }
     public function indexaction(){
 
         $auth = new AuthenticationController();
@@ -105,8 +128,12 @@ class AppController extends Controller {
             $id_category = $_POST['id_category'];
         }
         $textes = $tm->getTextes($_SESSION['id_user'], $id_category);
+        $categories = $tm->getCategories($_SESSION['id_user']);
 
-        echo json_encode($textes);
+        echo json_encode([
+            'textes' => $textes,
+            'categories' => $categories
+        ]);
         die;
 
     }
@@ -120,24 +147,47 @@ class AppController extends Controller {
         die;
 
     }
+
+    public function getCategoryAjax(){
+
+        $tm = new TextManager();
+        $categories = $tm->getCategoryById($_POST['id_category']);
+
+        echo json_encode($categories);
+        die;
+
+    }
+    
     public function getTextAjax(){
 
         $tm = new TextManager();
         $em = new ExpressionManager();
         
         $texte = $tm->getTextById($_POST['id_text'], $_SESSION['id_user']);
-        $recordExpressions = $em->getRecordExpressions($_SESSION['id_user'], $_POST['id_text']);
+        // $recordExpressions = $em->getRecordExpressions($_SESSION['id_user']);
 
-        $textContentArea = $this->textHoverWord([
-            'textContent' => $texte['content_text'],
-            'recordexpressions' => $recordExpressions
-        ]);
+        // $textContentArea = $this->textHoverWord([
+        //     'textContent' => $texte['content_text'],
+        //     'recordexpressions' => $recordExpressions
+        // ]);
 
-        $texte['textContentArea'] = $textContentArea;
+        // $texte['textContentArea'] = $textContentArea;
+        $texte['textContentArea'] = $texte['content_text'];
 
         echo json_encode($texte);
         die;
 
+    }
+
+    public function getExpressionsByUserAjax(){
+
+        $em = new ExpressionManager();
+        $recordExpressions = $em->getRecordExpressions($_SESSION['id_user']);
+
+        echo \json_encode([
+            'error' => false,
+            'record_expressions' => $recordExpressions
+        ]);
     }
 
     public function updateTextAjax(){
@@ -166,22 +216,39 @@ class AppController extends Controller {
 
     }
 
+    public function updateCategoryAjax(){
+
+        $tm = new TextManager();
+
+        $result = $tm->updateCategory($_POST['id_category'], $_POST['name_category'], $_SESSION['id_user']);
+
+        echo json_encode([
+            'result' => $result
+        ]);
+        die;
+
+    }
+
     public function saveTextAjax(){
 
         $tm = new TextManager();
-        // debug( file_exists(ROOT.'/public/uploads/60e455b2df007/html/60e455b2df007-1.html') );
-// debug(ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$_POST['id_file'].DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$_POST['id_file'].'-1.html');
+
         $nbpage = 0;
-        for($i = 1; $i <= 2000; $i++){
-            if(!file_exists(ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$_POST['id_file'].DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$_POST['id_file'].'-'.$i.'.html')){
-                $nbpage = $i;
-                break;
-            }
-            $i++;
+
+        if($_POST['type_text'] == 'pdf'){
+            for($i = 1; $i <= 2000; $i++){
+                if(!file_exists(ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$_POST['id_file'].DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$_POST['id_file'].'-'.$i.'.html')){
+                    $nbpage = $i;
+                    break;
+                }
+                $i++;
+            }     
+            $nbpage = $nbpage - 2;
         }
 
-
-        $nbpage = $nbpage - 2;
+        if($_POST['type_text'] == 'link'){
+            $nbpage = 1;
+        }
 
         // debug($nbpage);
         $data = [
@@ -194,10 +261,9 @@ class AppController extends Controller {
             'file_name_pdf_server' => $_POST['file_name_pdf_server'],
             'slug' => $_POST['slug'],
             'file_html' => $_POST['file_html'],
-            'nb_page' => $nbpage
+            'nb_page' => $nbpage,
+            'file_name_server_link' => $_POST['file_name_server_link']
         ];
-
-
 
         $id_text = $tm->saveText($data);
 
@@ -217,22 +283,29 @@ class AppController extends Controller {
                 <div class="arrow-popuptrad"></div>
                 <div id="translationPopupText" class="text-center">
                   <div style="margin: 10px;font-weight:normal;display:none;" id="selText"></div>
-                  <div style="margin: 10px;font-size:1.2em;font-weight:bold;" id="frenchValue"></div>
+                  <textarea style="margin: 10px;font-size: 1.5em;font-weight: bold;width: 95%;border: none;overflow: hidden;font-family: cursive;" id="frenchValue"></textarea>
                 </div>
-                <div class="display-flex-center">
+                <div class="display-flex-center" id="container-btn-save-expression">
                   <div id="btnSaveExpression" class="display-flex-center" style="background-color: #6592ff"></div>
                 </div>
             </div>
             ';
 
-            for($i = 1; $i <= $nbpage; $i++){
-                $file_root = ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$_POST['id_file'].DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$_POST['id_file'].'-'.$i.'.html';
+            if($_POST['type_text'] == 'pdf'){
+                for($i = 1; $i <= $nbpage; $i++){
+                    $file_root = ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$_POST['id_file'].DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$_POST['id_file'].'-'.$i.'.html';
+                    $texte = file_get_contents($file_root);
+                    $texte = preg_replace('/\<\/head\>/', $links.'</head>', $texte, 1);
+                    $texte = preg_replace('/\<\/body\>/', $add_html.'</body>', $texte, 1);
+                    file_put_contents($file_root, $texte);                
+                }                
+            }elseif($_POST['type_text'] == 'link'){
+                $file_root = ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'links'.DIRECTORY_SEPARATOR.$_POST['file_name_server_link'];
                 $texte = file_get_contents($file_root);
                 $texte = preg_replace('/\<\/head\>/', $links.'</head>', $texte, 1);
                 $texte = preg_replace('/\<\/body\>/', $add_html.'</body>', $texte, 1);
-                file_put_contents($file_root, $texte);                
+                file_put_contents($file_root, $texte);      
             }
-
 
             // $em = new ExpressionManager();
             // $recordExpressions = $em->getRecordExpressions($_SESSION['id_user'], $id_text);
@@ -241,10 +314,9 @@ class AppController extends Controller {
             //     'textContent' => $texte,
             //     'recordexpressions' => $recordExpressions
             // ]);
-            // debug($texte);
         }
 
-        $resilt = false;
+        $result = false;
         if(strlen($id_text) > 0){
             $result = true;
         }
@@ -312,24 +384,35 @@ class AppController extends Controller {
 
     }
 
-    public function getHtmlPage(){
+    public function saveHtmlPage(){
         // Initialize a file URL to the variable
-        $url = 'https://naturalnewsblogs.com/best-ways-to-boost-your-immune-system/';
-        $file_name = basename($url).'.html';
+        // debug($_POST);
+        $url = $_POST['url'];
+        
+        $uniqid = uniqid();
+        
+        $file_name = ROOT.'public/uploads/links/'.$uniqid.'.html';
         if(file_put_contents( $file_name,file_get_contents($url))) {
-            move_uploaded_file(ROOT.'', 'public/pages/'. time() . '.pdf');
-            echo "File downloaded successfully";
+            // move_uploaded_file(ROOT.'public/uploads/temp/', ROOT.'public/uploads/links/'.$uniqid.'.html');
+            // echo "File downloaded successfully";
         }
         else {
-            echo "File downloading failed.";
+            // echo "File downloading failed.";
         }
+        echo json_encode(
+            [
+                'error' => false,
+                'url' => URLROOT.'/public/uploads/links/'.$uniqid.'.html',
+                'file_name_server' => $uniqid.'.html'
+            ]
+        );
     }
 
     public function textesRevisionAjax(){
 
         $tm = new TextManager();
 
-        $result = $tm->getTextesRevision($_SESSION{'id_user'});
+        $result = $tm->getTextesRevision($_SESSION['id_user']);
 
         // debug($result);
         echo json_encode($result);
@@ -341,7 +424,7 @@ class AppController extends Controller {
 
         $tm = new SerieManager();
 
-        $result = $tm->getSeriesRevision($_SESSION{'id_user'}, $_POST['id_text']);
+        $result = $tm->getSeriesRevision($_SESSION['id_user'], $_POST['id_text']);
 
         echo json_encode($result);
         die;
@@ -352,7 +435,18 @@ class AppController extends Controller {
 
         $tm = new SerieManager();
 
-        $result = $tm->getSerieById($_SESSION{'id_user'}, $_POST['id_text'], $_POST['id_serie']);
+        $result = $tm->getSerieById($_SESSION['id_user'], $_POST['id_text'], $_POST['id_serie']);
+
+        echo json_encode($result);
+        die;
+
+    }
+
+    public function getSeriesByUserAjax(){
+
+        $tm = new SerieManager();
+
+        $result = $tm->getSeriesByUser($_SESSION['id_user']);
 
         echo json_encode($result);
         die;
@@ -361,7 +455,6 @@ class AppController extends Controller {
 
     public function saveDataserie(){
 
-        // debug($_POST);
         $sm = new SerieManager();
 
         $data = [
@@ -370,7 +463,7 @@ class AppController extends Controller {
             'id_histoserie' => $_POST['id_histoserie'],
             'id_serie'=> $_POST['id_serie'],
             'id_expression'=> $_POST['id_expression'],
-            'result'=> ($_POST['result']== false ? 0 : 1),
+            'result'=> ($_POST['result'] == 'false' ? 0 : 1),
         ];
 
         $histoserie = [];
@@ -416,7 +509,7 @@ class AppController extends Controller {
 
         $em = new ExpressionManager();
 
-        $expression = $em->checkExpressionExist(trim(strtolower($_POST['expression'])));
+        $expression = $em->checkExpressionExist(trim(strtolower($_POST['english_value'])));
 
         if($expression){
 
@@ -439,7 +532,7 @@ class AppController extends Controller {
 
         }else{
             // appel de l'api de traduction de google
-            $english_value = str_replace(' ', '%20',trim($_POST['expression']));
+            $english_value = str_replace(' ', '%20',trim($_POST['english_value']));
             $curl = curl_init();
             curl_setopt($curl, CURLOPT_URL, 'https://translation.googleapis.com/language/translate/v2/?q='.$english_value.'&source=en&target=fr&key=AIzaSyDXclEOa7zqozby4oRS_Z1q7KIzsmclaTc');
             // curl_setopt($curl, CURLOPT_HTTPHEADER, array(
@@ -453,19 +546,19 @@ class AppController extends Controller {
             // EXECUTE:
             $result = curl_exec($curl);
 
-            if(!$result){die("Erreur de connexion à l'API de Google traduction");}
+            if(!$result){die("Erreur de connexion au service de traduction");}
             curl_close($curl);
 
             $array_result = json_decode($result, true);
             $french_val = $array_result['data']['translations'][0]['translatedText'];
-// debug($result);
-            $result = $em->saveExpression($french_val, $_POST['expression']);
+// debug($french_val);
+            $result = $em->saveExpression($french_val, $_POST['english_value']);
              if($result){
                 // Insérer la nouvelle expression en base de donnée
                 echo json_encode([
                     'existDb' => 'no', 
                     'existUserSpace' => 'no', 
-                    'translation' => ucfirst($french_val)
+                    'translation' => $french_val
                 ]);                 
              }else{
                 echo json_encode([
@@ -479,12 +572,13 @@ class AppController extends Controller {
     }
 
     public function SaveExpressionAjax(){
-
+        // debug($_POST);
         $em = new ExpressionManager();
+        $sm = new SerieManager();
 
-        $expression = $em->checkExpressionExist(trim(strtolower($_POST['english_value'])));
-
-        $series = $em->getSeriesByText($_POST['id_text'], $_SESSION['id_user']);
+        $expression = $em->checkExpressionExist(trim($_POST['english_value']));
+        
+        $series = $sm->getSeriesByText($_POST['id_text'], $_SESSION['id_user']);
 
         $id_serie = 0;
 
@@ -499,7 +593,6 @@ class AppController extends Controller {
                 }
             }
             if($id_serie == 0){
-                var_dump('ici 4');
                 // on crée une série et on récupère son id
                 $id_serie = $em->createSerie('Serie '.(count($series)+1), $_POST['id_text'], $_SESSION['id_user']);
                 if(!$id_serie){
@@ -525,7 +618,7 @@ class AppController extends Controller {
             'id_user' => $_SESSION['id_user'],
             'id_serie' => $id_serie
         ];
-        // die('stop 2');
+
         $result = $em->saveRecordExpression($data);
 
         if($result){
@@ -563,6 +656,67 @@ class AppController extends Controller {
         ]);
         die;
 
+    }
+
+    public function DeleteRecordExpressionAjax(){
+
+        $em = new ExpressionManager();
+
+        $res = $em->deleteRecordExpression($_POST['id_record_expression'], $_SESSION['id_user']);
+
+        $msg = 'Echec de la suppression';
+        $error = true;
+
+        if($res){
+            $msg = 'Suppression effectuée avec succès';
+            $error = false;
+        }
+
+        echo json_encode([
+            'error' => $error,
+            'msg' => $msg
+        ]);
+    }
+
+    public function DeleteRecordExpressionsCheckedAjax(){
+
+        $em = new ExpressionManager();
+
+        $res = $em->deleteRecordExpressionsChecked($_POST['id_record_expressions'], $_SESSION['id_user']);
+
+        $msg = 'Echec de la suppression';
+        $error = true;
+
+        if($res){
+            $msg = 'Suppression effectuée avec succès';
+            $error = false;
+        }
+
+        echo json_encode([
+            'error' => $error,
+            'msg' => $msg,
+            'record_expressions_deleted' => $_POST['id_record_expressions']
+        ]);
+    }
+
+    public function UpdateRecordExpressionsSelectedAjax(){
+
+        $em = new ExpressionManager();
+
+        $res = $em->updateRecordExpressionsSelected($_POST['id_record_expression_selected'], $_POST['french_value'], $_SESSION['id_user']);
+
+        $msg = 'Echec de la mise à jour';
+        $error = true;
+
+        if($res){
+            $msg = 'Mise à jour effectuée avec succès';
+            $error = false;
+        }
+
+        echo json_encode([
+            'error' => $error,
+            'msg' => $msg
+        ]);
     }
 
 }

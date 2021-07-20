@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Container, Row, Col} from 'reactstrap';
 import {root} from './../setup'
 import { Link } from 'react-router-dom';
+import {insertLog} from './../functions'
 
 export default class Text extends Component {
 
@@ -18,11 +19,15 @@ export default class Text extends Component {
       msgBtnSave: 'Enregistrer',
       colorBtnSave: '#6592ff',
       textCategory: '',
+      textTitle: '',
       wysiwyg_bg_color: '#fff',
       type_text: '',
       active_page: 1,
       heightContainerIframePdf: '500px',
-      zoom: 1.92
+      zoom: 1.92,
+      fullSreenPdf: false,
+      file_name_server: '',
+      file_name_server_link: ''
     }
 
       this.inputTitleText = document.querySelector("#title-text");
@@ -40,6 +45,7 @@ export default class Text extends Component {
         data: formdata
       })
       .then((response) => {
+        console.log(response)
         let text = response.data;
         this.setState({
           texte: text,
@@ -48,13 +54,17 @@ export default class Text extends Component {
           textTitle: text.title_text,
           textCategory: text.fk_id_category,
           type_text: text.type_text,
-          active_page: parseInt(text.active_page)
+          active_page: parseInt(text.active_page),
+          file_name_server: text.file_name_server,
+          file_name_server_link: text.file_name_server_link
         });
       })
       .catch( (error) => {
         console.log(error);
       });     
-    
+
+      insertLog(axios, 2, 1)
+      
   }
 
   componentDidMount(){
@@ -78,7 +88,7 @@ export default class Text extends Component {
     }  
 
     document.querySelector("#container-iframe-pdf").scrollTo(0, 0)
-    
+
   }
 
   zoonIn(){
@@ -87,6 +97,41 @@ export default class Text extends Component {
 
   zoonOut(){
     this.setState({zoom: this.state.zoom - 0.06})
+  }
+
+  fullScreenIframePdf(){
+    if(this.state.fullSreenPdf){
+      this.setState({fullSreenPdf: false})
+      $("#iframe-pdf").css({
+        'position': 'relative',
+        'top': '-0px',
+        'left': '-0px',
+        'z-index': 1,
+        'overflow': 'scroll',
+        'height': '1720px',
+        'width': '100%'
+      })
+      $("#full-screen-btn").css({
+        'top': '11px',
+        'right': '43px'
+      })
+    }else{
+      this.setState({fullSreenPdf: true})
+      $("#iframe-pdf").css({
+        'position': 'absolute',
+        'top': '-156px',
+        'left': '-62px',
+        'z-index': 1,
+        'overflow': 'scroll',
+        'height': '100%',
+        'width': '100%'
+      })
+      $("#full-screen-btn").css({
+        'top': '-83px',
+        'right': '-68px'
+      })
+    }
+
   }
 
   render() {
@@ -102,7 +147,6 @@ export default class Text extends Component {
                               <div className="btn-forms">Editer</div>
                         </Link>
                       </div>
-
                       <div 
                         id="container-text"
                         style={{marginTop: '20px'}}>
@@ -117,7 +161,7 @@ export default class Text extends Component {
 
                     </div>;
       }else if(this.state.type_text == 'pdf'){
-        console.log(this.state.texte);
+
         /*let src = root+"/public/pages/web/viewer.html?file="+this.state.texte.file_name_server.replace('public/pages/web/', '');*/
         let fns = this.state.texte.file_name_server.replace(".pdf", "")
 
@@ -129,6 +173,8 @@ export default class Text extends Component {
         let src = root+'public/uploads/'+fns+'/html/'+fns+'-'+this.state.active_page+'.html'+ancre;
         text = 
         <div id="container-iframe-pdf" style={{height: this.state.heightContainerIframePdf}}>
+          <div id="full-screen-btn" onClick={()=>{this.fullScreenIframePdf()}}
+          ></div>
           <div className="container-btn-page">
             <div id="btn-page-previous"  className="arrow-btn-page" onClick={() => { this.changePage('previous')}} ></div>
             <div id="btn-page-next"  className="arrow-btn-page" onClick={() => { this.changePage('next')}} ></div>
@@ -146,6 +192,23 @@ export default class Text extends Component {
             style={{zoom: '0.75', transform: 'scale('+this.state.zoom+')', transformOrigin: '0 0'}}
           ></iframe>
         </div>
+      }else if(this.state.type_text == 'link'){
+
+        let fnsl = this.state.texte.file_name_server_link
+
+        let src = root+'public/uploads/links/'+fnsl;
+        text = 
+        <div id="container-iframe-pdf" style={{height: this.state.heightContainerIframePdf}}>
+          <iframe
+            className="iframe-link" 
+            id="iframe-pdf" 
+            data-textid={this.state.texte.id_text}
+            data-id_ancre={this.state.texte.ancre_ligne}
+            data-texte={JSON.stringify(this.state.texte)}
+            src={src}
+          ></iframe>
+        </div>
+
       }
 
     return (
@@ -153,8 +216,8 @@ export default class Text extends Component {
           <Container>
           <div className="block-text-add">
             <Row>
-              <div className="main-titles">
-                TEXTE
+              <div style={{fontWeight: 'bold', fontSize: '20px', textAlign: 'center', width: '100%'}}>
+                {this.state.texte.title_text}
               </div>
             </Row>
             <Row>

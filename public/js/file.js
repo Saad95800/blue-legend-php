@@ -2,23 +2,31 @@
 
 document.addEventListener("DOMContentLoaded", function(){
 
-    let id = 1
-    let add = true
-    $('p').each(function(){
-        if(add){
-            let bgcolor = '#ffe999'
-            let id_ancre = $(window.parent.document).find('#iframe-pdf').data('id_ancre')
+    let frenchValue = ''
 
-            if( (id_ancre == id) && ($(window.parent.document).find('#view-active-page').data('active_page') == $(window.parent.document).find('#iframe-pdf').data('texte').active_page) ){
-                bgcolor = '#5fff5f'
+    if($(window.parent.document).find('#iframe-pdf').data('texte').type_text == 'pdf'){
+        let id = 1
+        let add = true
+        $('p').each(function(){
+            if(add){
+                let bgcolor = '#ffe999'
+                let id_ancre = $(window.parent.document).find('#iframe-pdf').data('id_ancre')
+
+                if( (id_ancre == id) && ($(window.parent.document).find('#view-active-page').data('active_page') == $(window.parent.document).find('#iframe-pdf').data('texte').active_page) ){
+                    bgcolor = '#5fff5f'
+                }
+                   
+                $(this).after('<span id="#ancre-'+id+'" class="link-ancre-ligne"><div class="ancre-ligne" id="ancre-'+id+'" style="top:'+$(this).css("top")+';left: 22px;background-color:'+bgcolor+';"></div></span>')
+                id++
+                add = false           
+            }else{
+                add = true
             }
-            $(this).after('<span id="#ancre-'+id+'" class="link-ancre-ligne"><div class="ancre-ligne" id="ancre-'+id+'" style="top:'+$(this).css("top")+';left: 22px;background-color:'+bgcolor+';"></div></span>')
-            id++
-            add = false           
-        }else{
-            add = true
-        }
+        })
+    }
 
+    $('a').on('click', function(e){
+        e.preventDefault()  
     })
 
     $(document).on('click', '.ancre-ligne', function(){
@@ -51,39 +59,46 @@ document.addEventListener("DOMContentLoaded", function(){
     })
 
     document.getElementById('btnSaveExpression').addEventListener('click', function(e){
-        console.log("on click btn save expression")
         e.stopPropagation();
         saveExpression();
     })
     document.getElementById('popupTrad').addEventListener('click', function(e){
-        console.log("on click popuptrad")
         e.stopPropagation();
     })
    
     document.body.addEventListener('mousedown', function(e){
-        console.log("on mousedown")
+        console.log('mousedown')
         if(e.target.getAttribute('id') != 'btnSaveExpression' && e.target.getAttribute('id') != 'popupTrad'){
             changePopup('mousedown', e);
         }
     })
 
     document.body.addEventListener('mouseup', function(e){
-        console.log("on mouseup")
-        console.log(e.target)
+        console.log('mouseup')
         if(e.target.getAttribute('id') != 'btnSaveExpression' && e.target.getAttribute('id') != 'popupTrad'){
             changePopup('mouseup', e);
         }
     })
 
     $(document).on('click', '.block-hover-word', function(e) {
-        let word = $(this).find('.hover-word').text();
-        console.log($(this));
-        // $("#selText").html(word);
+        // let word = $(this).find('.hover-word').text();
         $("#frenchValue").html($(this).find('.hover-word-french').text());
         $("#frenchValue").css('font-size', '1.5em');
         let ele = $('#popupTrad');
         $(this).find('.popup-hover-word').html('<div class="popup-trad" style="display:inline-block;margin-left: -130px;margin-top: 20px;">'+ele.html()+'</div>');
         $(this).find('#btnSaveExpression').remove();
+      });
+
+      $('#frenchValue').on('mouseup', function(e) {
+
+        $(this).val(localStorage.getItem('frenchValue'))
+        e.stopPropagation()
+
+      });
+
+      $('#frenchValue').on('keydown', function(e) {
+        localStorage.setItem('frenchValue', e.target.value)
+        $('#frenchValue').css('height', document.querySelector('#frenchValue').scrollHeight+'px')
       });
 
     document.getElementById('id-text').innerHTML = $(window.parent.document).find('#iframe-pdf').data('textid');
@@ -96,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function(){
 function saveExpression(){
     if($("#btnSaveExpression").html() == 'Enregistrer'){
         let formdata = new FormData()
-        formdata.append('french_value', document.getElementById('frenchValue').innerHTML)
+        formdata.append('french_value', document.getElementById('frenchValue').value)
         formdata.append('english_value', document.getElementById('selText').innerHTML)
         formdata.append('id_text', document.getElementById('id-text').innerHTML )
         axios({
@@ -138,14 +153,16 @@ function changePopup(mouse, e){
     var rel2= document.createRange();
     rel2.selectNode(document.getElementById('cal2'));
     let selText = sel.toString().trim().replace(/(\r\n|\n|\r)/gm, "");
+    localStorage.setItem('selText', selText)
     console.log(selText)
     if(selText != '' && selText != ' '){
         if(selText.length <= 200){
         if(mouse == 'mouseup'){
             /////////////////////////////////////////
             if (!sel.isCollapsed) {
+            $('#frenchValue').css('height', '40px')
             let formdata = new FormData()
-            formdata.append('expression', selText)
+            formdata.append('english_value', selText)
             axios({
                 method: 'post',
                 url: '/check-expression-exist-ajax',
@@ -163,9 +180,19 @@ function changePopup(mouse, e){
                 ele.style.top = ((r.bottom - rb2.top)*100/(rb1.top-rb2.top)+20) + 'px'; //this will place ele below the selection
                 ele.style.left = ((r.left - rb2.left)*100/(rb1.left-rb2.left)-90) + 'px'; //this will align the right edges together
                 ele.style.display = 'block';
+                if( parseInt($('#popupTrad').css('left').replace('px', '')) < 0 ){
+                    $('#popupTrad').css('left', '0px')
+                    $('.arrow-popuptrad').css('left', '0px')
+                }else{
+                    $('.arrow-popuptrad').css('left', '90px')
+                }
                 $("#popupTrad").css("display", "block !important");
                 $("#selText").html(selText);
-                $("#frenchValue").html(response.data.translation);
+                let translation = response.data.translation.replaceAll("&amp;", "&").replaceAll("&gt;", ">").replaceAll("&lt;", "<").replaceAll("&quot;", '"').replaceAll("&#39;", "'");
+                console.log(translation)
+                localStorage.setItem('frenchValue', translation)
+                $("#frenchValue").val(translation);
+                $('#frenchValue').css('height', document.querySelector('#frenchValue').scrollHeight+'px')
                 $("#frenchValue").css('font-size', '1.5em');
                 if(response.data.existUserSpace == 'no'){
                 // L'expression sélectionnéee n'éxiste pas dans l'espace de l'utilisateur
@@ -187,21 +214,28 @@ function changePopup(mouse, e){
             }
         
         }else{ // mousedown
-            window.getSelection().empty();
-            ele.style.display = 'none';
-            $("#btnSaveExpression").html('Enregistrer');
-            $("#frenchValue").html('');
-            $("#selText").html('');
-            $('.popup-hover-word').html("");
+            if(e.target.getAttribute('id') != 'frenchValue'){
+                window.getSelection().empty();
+                // ele.style.display = 'none';
+                // $("#btnSaveExpression").html('Enregistrer');
+                // $("#frenchValue").val('');
+                // $("#selText").html('');
+                // $('.popup-hover-word').html("");                
+            }
+
         }      
         }else{
             $("#btnSaveExpression").html('Maximum 40 caractères');
             $("#btnSaveExpression").css('background-color', 'red');
         }
     }else{
-        ele.style.display = 'none';
+        console.log(e.target.getAttribute('id'))
+        let id_target = e.target.getAttribute('id')
+        if(id_target != 'popupTrad' && id_target != 'translationPopupText' && id_target != 'frenchValue' && id_target != 'container-btn-save-expression' && id_target != 'btnSaveExpression'){
+            ele.style.display = 'none';
+        }
         $("#btnSaveExpression").html('Enregistrer');
-        $("#frenchValue").html('');
-        $("#selText").html('');
+        // $("#frenchValue").val('');
+        // $("#selText").html('');
     }
 }

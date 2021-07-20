@@ -161,7 +161,7 @@
                       $('.arrow-popuptrad').css('left', '90px');
                     }
                     let formdata = new FormData()
-                    formdata.append('expression', selText)
+                    formdata.append('english_value', selText)
                   axios({
                     method: 'post',
                     url: '/check-expression-exist-ajax',
@@ -174,8 +174,8 @@
                   .then((response) => {
                     console.log(response);
                     $("#popupTrad").css("display", "block !important");
-                    $("#selText").html(selText);
-                    $("#frenchValue").html(response.data.translation);
+                    $("#selText").text(selText);
+                    $("#frenchValue").val(ucFirst(response.data.translation));
                     if(response.data.existUserSpace == 'no'){
                       // L'expression sélectionnéee n'éxiste pas dans l'espace de l'utilisateur
                       $("#btnSaveExpression").css('display', 'flex');
@@ -200,15 +200,15 @@
             }else{
               ele.style.display = 'none';
               $("#btnSaveExpression").html('Enregistrer');
-              $("#frenchValue").html('');
-              $("#selText").html('');
+              $("#frenchValue").val('');
+              $("#selText").text('');
               $('.popup-hover-word').html("");
             }      
           }else{
             ele.style.display = 'none';
             $("#btnSaveExpression").html('Enregistrer');
-            $("#frenchValue").html('');
-            $("#selText").html('');
+            $("#frenchValue").val('');
+            $("#selText").text('');
           }
         }
 
@@ -216,8 +216,8 @@
           if($("#btnSaveExpression").html() == 'Enregistrer'){
 
             let formdata = new FormData()
-            formdata.append('french_value', $("#frenchValue").html())
-            formdata.append('english_value', $("#selText").html())
+            formdata.append('french_value', $("#frenchValue").val())
+            formdata.append('english_value', $("#selText").text())
             formdata.append('id_text', $("#id-text").html())
             axios({
               method: 'post',
@@ -261,7 +261,7 @@
           let word = $(this).find('.hover-word').text();
           console.log($(this));
           // $("#selText").html(word);
-          $("#frenchValue").html($(this).find('.hover-word-french').text());
+          $("#frenchValue").val($(this).find('.hover-word-french').text());
           $("#frenchValue").css('font-size', '1.5em');
           let ele = $('#popupTrad');
           $(this).find('.popup-hover-word').html('<div class="popup-trad" style="display:inline-block;margin-left: -130px;margin-top: 20px;">'+ele.html()+'</div>');
@@ -276,6 +276,36 @@
             $(this).attr('href', '#')
           })
         })
+        $('a').on('click', function(e){
+          e.preventDefault()
+        })
+        $('.PostSocial').each(function(){
+          $(this).remove()
+        })
+        $('.SocialButtons').each(function(){
+            $(this).remove()
+        })
+        $('.Twitter').each(function(){
+            $(this).remove()
+        })
+        $('.Add2Any').each(function(){
+            $(this).remove()
+        })
+        $('.Comments').each(function(){
+            $(this).remove()
+        })
+        $('.Email').each(function(){
+            $(this).remove()
+        })
+        $('.Print').each(function(){
+            $(this).remove()
+        })
+
+        function ucFirst(str){
+          if (typeof str !== 'string') return ''
+          return str.charAt(0).toUpperCase() + str.slice(1)
+        }
+        
 </script>
 
     <div id="cal1">&nbsp;</div>
@@ -283,11 +313,11 @@
     <div id="popupTrad" class="popup-trad">
         <div class="arrow-popuptrad"></div>
         <div id="translationPopupText" class="text-center">
-        <div style="margin: 10px;font-weight:normal;display:none;" id="selText"></div>
-        <div style="margin: 10px;font-weight:normal;" id="frenchValue"></div>
+          <div style="margin: 10px;font-weight:normal;display:none;" id="selText"></div>
+          <textarea style="text-align:center;margin: 10px;font-size: 1.5em;font-weight: bold;width: 95%;border: none;overflow: hidden;font-family: cursive;" id="frenchValue"></textarea>
         </div>
-        <div class="display-flex-center">
-        <div id="btnSaveExpression" class="display-flex-center"></div>
+        <div class="display-flex-center" id="container-btn-save-expression">
+          <div id="btnSaveExpression" class="display-flex-center" style="background-color: #6592ff"></div>
         </div>
     </div>
     

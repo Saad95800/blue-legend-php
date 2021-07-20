@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import {insertLog} from './../functions';
 
 export default class btnBeginRevision extends Component {
 
@@ -12,6 +14,9 @@ export default class btnBeginRevision extends Component {
     this.state = {
       id_serie: id_serie
     }
+
+    insertLog(axios, 9, 1)
+
   }
 
   render() {

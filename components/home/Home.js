@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Row, Col } from 'reactstrap';
+import {insertLog} from './../functions';
 import axios from 'axios';
 
 export default class Home extends Component {
@@ -21,6 +22,9 @@ export default class Home extends Component {
         nbMotsExprApprisToday: nbMotsExprApprisToday,
         nbMotsExprTotalAppris: nbMotsExprTotalAppris
       }
+
+      insertLog(axios, 8, 1)
+
     }
 
     componentDidMount(){
@@ -99,13 +103,13 @@ export default class Home extends Component {
                   </Col>
                 </Row>
                 <Row style={{marginTop: '20px'}}>
-                  <Col sm="3">
+                  <Col sm="6">
                     <Link to={'/texte-liste'} className="home-item-nav home-item-nav-lecture">
                       <div className="home-title-nav home-title-nav-lecture text-center">Lecture</div>
                       <div className="home-logo-item home-logo-item-lecture"></div>
                     </Link>
                   </Col>
-                  <Col sm="3">
+                  {/* <Col sm="3">
                     <Link to={'/planning'} className="home-item-nav home-item-nav-planning">
                       <div className="home-title-nav home-title-nav-planning text-center">Planning</div>
                       <div className="home-logo-item home-logo-item-planning"></div>
@@ -116,8 +120,8 @@ export default class Home extends Component {
                       <div className="home-title-nav home-title-nav-custom text-center">Séries pers</div>
                       <div className="home-logo-item home-logo-item-custom"></div>
                     </Link>
-                  </Col>
-                  <Col sm="3">
+                  </Col> */}
+                  <Col sm="6">
                     <Link to={'/revision'} className="home-item-nav home-item-nav-revision">
                       <div className="home-title-nav home-title-nav-revision text-center">Révision</div>
                       <div className="home-logo-item home-logo-item-revision"></div>

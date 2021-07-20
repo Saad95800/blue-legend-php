@@ -69,32 +69,32 @@ export default class NavBar extends Component {
             title: 'Expressions',
             cssTitle: {position: 'absolute', marginTop: '58px', marginLeft: '-64px', color: 'white'}
         },
-        {
-            url:"/series",
-            classContainer:"bloc-btn-menu",
-            classItem:"menu-item nav-serie",
-            id:"item-menu-serie",
-            style: {},
-            isSelected: false,
-            title: 'Séries',
-            cssTitle: {position: 'absolute', marginTop: '58px', marginLeft: '-44px', color: 'white'}
-        },
-        {
-            url:"/planning",
-            classContainer:"bloc-btn-menu",
-            classItem:"menu-item nav-planning",
-            id:"item-menu-planning",
-            style: {},
-            isSelected: false
-        },
-        {
-            url:"/statistiques",
-            classContainer:"bloc-btn-menu",
-            classItem:"menu-item nav-statistiques",
-            id:"item-menu-statistiques",
-            style: {},
-            isSelected: false
-        }
+        // {
+        //     url:"/series",
+        //     classContainer:"bloc-btn-menu",
+        //     classItem:"menu-item nav-serie",
+        //     id:"item-menu-serie",
+        //     style: {},
+        //     isSelected: false,
+        //     title: 'Séries',
+        //     cssTitle: {position: 'absolute', marginTop: '58px', marginLeft: '-44px', color: 'white'}
+        // },
+        // {
+        //     url:"/planning",
+        //     classContainer:"bloc-btn-menu",
+        //     classItem:"menu-item nav-planning",
+        //     id:"item-menu-planning",
+        //     style: {},
+        //     isSelected: false
+        // },
+        // {
+        //     url:"/statistiques",
+        //     classContainer:"bloc-btn-menu",
+        //     classItem:"menu-item nav-statistiques",
+        //     id:"item-menu-statistiques",
+        //     style: {},
+        //     isSelected: false
+        // }
       ],
       itemsLeft:[
         {
@@ -113,7 +113,8 @@ export default class NavBar extends Component {
             classItem:"menu-item-left nav-item-left",
             id:"item-menu-info-user",
             style: {},
-            isSelected: false
+            isSelected: false,
+            title: 'Infos Utilisateur',
         },
         {
             url:"/parametres",
@@ -121,7 +122,8 @@ export default class NavBar extends Component {
             classItem:"menu-item-left nav-item-left",
             id:"item-menu-parametres",
             style: {},
-            isSelected: false
+            isSelected: false,
+            title: 'Paramètres',
         }
       ],
       url_courante: this.props.data.url,
@@ -202,6 +204,7 @@ export default class NavBar extends Component {
                             colorHoverItem={this.colorHoverItem.bind(this)} 
                             colorMouseOutItem={this.colorMouseOutItem.bind(this)} 
                             colorClickItem={this.colorClickItem.bind(this)}
+                            position="top"
                             key={item.id}
                           />
     });
@@ -219,6 +222,7 @@ export default class NavBar extends Component {
                             colorHoverItem={this.colorHoverItem.bind(this)} 
                             colorMouseOutItem={this.colorMouseOutItem.bind(this)} 
                             colorClickItem={this.colorClickItem.bind(this)}
+                            position="left"
                             key={item.id}
                           />
     });
@@ -257,9 +261,9 @@ export default class NavBar extends Component {
                             colorClickItem={this.colorClickItem.bind(this)}
                             colorHoverItem={() => {}}
                           />
-            <div className="display-flex-center" style={{justifyContent: 'left', color: '#fff', minWidth: '150px', height: '74px', padding: '12px 20px', textAlign: 'center', float: 'right'}} id="username">
+            <div className="display-flex-center" style={{justifyContent: 'left', color: '#fff', minWidth: '150px', height: '74px', padding: '7px 10px', textAlign: 'center', float: 'right'}} id="username">
               <div className="navbar-img-user"></div>
-              <div style={{marginLeft: '8px', fontWeight: 'bold', fontSize: '1.3em', fontFamily: 'cursive'}}>{capitalizeFirstLetter(this.state.username)}</div>
+              <div style={{marginLeft: '8px', fontFamily: 'cursive'}}>{capitalizeFirstLetter(this.state.username)}</div>
             </div>
         </nav>
         <nav className="navbar-home-left">

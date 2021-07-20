@@ -9,6 +9,7 @@ import Text from './text-list/Text';
 import TextEdit from './text-list/TextEdit';
 import CategoryList from './category/CategoryList';
 import CategoryAdd from './category/CategoryAdd';
+import CategoryEdit from './category/CategoryEdit';
 import Revision from './revision/Revision';
 import CustomSeriesList from './revision/CustomSeriesList';
 import AddCustomSerie from './revision/AddCustomSerie';
@@ -93,7 +94,7 @@ export default class Appclient extends Component {
                             path="/ajout-texte" 
                             render={(props) => { return <TextAdd {...props} 
                             data={data} 
-                            viewMessageFlash={this.viewMessageFlash} 
+                            viewMessageFlash={this.viewMessageFlash.bind(this)} 
                             />}} 
                           />
                           <Route 
@@ -118,14 +119,21 @@ export default class Appclient extends Component {
                             path="/categorie-ajout" 
                             render={(props) => { return <CategoryAdd {...props} 
                             data={data} 
-                            viewMessageFlash={this.viewMessageFlash} 
+                            viewMessageFlash={this.viewMessageFlash.bind(this)} 
+                            />}} 
+                          />
+                          <Route 
+                            path="/categorie-edit/:id_category" 
+                            render={(props) => { return <CategoryEdit {...props} 
+                            data={data} 
+                            viewMessageFlash={this.viewMessageFlash.bind(this)} 
                             />}} 
                           />
                           <Route 
                             path="/texte/:id_texte" 
                             render={ (props) => { return <Text {...props} 
                             data={data} 
-                            viewMessageFlash={this.viewMessageFlash} 
+                            viewMessageFlash={this.viewMessageFlash.bind(this)} 
                             />} } 
                           />    
                           {/* <SwipeableRoutes> */}
@@ -184,7 +192,7 @@ export default class Appclient extends Component {
                             />
                             <Route 
                               path="/expressions" 
-                              render={ (props) => { return <ExpressionList {...props} 
+                              render={ (props) => { return <ExpressionList viewMessageFlash={this.viewMessageFlash.bind(this)} {...props} 
                               data={data} 
                                />} } 
                             />
@@ -197,7 +205,7 @@ export default class Appclient extends Component {
                           {/* </SwipeableRoutes> */}
                           <Route 
                             path="/texte-edit/:id_texte"
-                            render={ (props) => { return <TextEdit viewMessageFlash={this.viewMessageFlash.bind} {...props} 
+                            render={ (props) => { return <TextEdit viewMessageFlash={this.viewMessageFlash.bind(this)} {...props} 
                             data={data} 
                             />} }
                           />

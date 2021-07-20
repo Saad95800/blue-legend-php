@@ -8,7 +8,7 @@ class UserManager extends Model {
     public function saveUser(){
 
         $data = $_POST;
-        if($this->chefIfEmailExist($data['email'])){
+        if($this->checkIfEmailExist($data['email'])){
             return [
                 'error' => true,
                 'msg' => 'Cet email est déjà utilisé',
@@ -28,6 +28,8 @@ class UserManager extends Model {
         $result = $req->execute();
 
         $id_user = $this->dbh->lastInsertId();
+
+        $this->insertLog('accueil', 2, 'Création de l\'utilisateur d\'id : '.$id_user);
 
         if ($result) {
             $_SESSION['id_user'] = $id_user;
@@ -75,7 +77,7 @@ class UserManager extends Model {
         return false;
     }
 
-    public function chefIfEmailExist($email){			
+    public function checkIfEmailExist($email){			
 
         $sql = "SELECT * FROM bl_user WHERE email_user = :email";
 

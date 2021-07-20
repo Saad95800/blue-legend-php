@@ -4,6 +4,7 @@ import axios from 'axios';
 import Trumbowyg from 'react-trumbowyg';
 import { Container, Row, Col, FormGroup, Label, Input } from 'reactstrap';
 import {root} from './../setup'
+import {insertLog} from './../functions'
 
 export default class TextEdit extends Component {
 
@@ -20,6 +21,8 @@ export default class TextEdit extends Component {
             redirect: false,
             to: '/texte/'+this.props.location.pathname.split("/")[2]
         }
+
+        insertLog(axios, 3, 1)
 
     }
 

@@ -58,6 +58,10 @@ export default class NavItem extends Component {
                 onClick={this.colorClickItem.bind(this)} 
                 id={this.props.id}>
             </Link>
+            <div className={this.props.position == "left"? 'a1':'at1'}>
+              <div className={this.props.position == "left"? 'a2':'at2'}></div>
+              <div className={this.props.position == "left"? 'a3':'at3'}>{this.props.title}</div>
+            </div>
             {/* <span style={this.props.cssTitle}>{this.props.title}</span> */}
         </div>
     );

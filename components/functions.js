@@ -1,3 +1,24 @@
+function insertLog(axios, page_log, id_type_log){
+
+  let formdata = new FormData()
+  formdata.append('page_log', page_log)
+  formdata.append('id_type_log', id_type_log)
+
+  axios({
+    method: 'post',
+    url: '/insert-log-ajax',
+    responseType: 'json',
+    data: formdata
+  })
+  .then((response) => {
+    console.log(response)
+  })
+  .catch( (error) => {
+    console.log(error);
+  });
+
+}
+
 function timeConverter(UNIX_timestamp){
     var a = new Date(UNIX_timestamp * 1000);
     var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -69,11 +90,38 @@ function timeConverter(UNIX_timestamp){
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
 
+  function limit20str(str){
+    return str.length > 20 ? str.substring(0, 20)+'...' : str
+  }
+
+  function limit15str(str){
+    return str.length > 15 ? str.substring(0, 15)+'...' : str
+  }
+
+  function replaceSpecialChar(str){
+    return str.replaceAll("&amp;", "&").replaceAll("&gt;", ">").replaceAll("&lt;", "<").replaceAll("&quot;", '"').replaceAll("&#39;", "'")
+  }
+
+  function isURL(str) {
+    const pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+      '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+    return !!pattern.test(str);
+  }
+
 export {
+    insertLog,
     timeConverter, 
     getDate, 
     getHour, 
     checkPassword,
     capitalizeFirstLetter,
-    ucFirst
+    ucFirst,
+    limit20str,
+    limit15str,
+    replaceSpecialChar,
+    isURL
 };

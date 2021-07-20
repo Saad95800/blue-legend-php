@@ -7,6 +7,7 @@ import BtnBeginRevision from './BtnBeginRevision';
 import SerieRevision from './SerieRevision';
 import axios from 'axios';
 import { Row, Col } from 'reactstrap';
+import {insertLog} from './../functions';
 
 export default class Revision extends Component {
 
@@ -40,6 +41,8 @@ export default class Revision extends Component {
         "2": "Contre la montre"
       }
     }
+
+    insertLog(axios, 12, 1)
     
   }
 
@@ -186,7 +189,7 @@ export default class Revision extends Component {
     }
 
     return (
-      <div className="container-revision container-page">
+      <div className="container container-page">
         <Row>
           <div className="main-titles">
             REVISION

@@ -1,10 +1,15 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import {insertLog} from './../functions';
 
 export default class contentRevision extends Component {
 
   constructor(props){
     super(props);
+
+    insertLog(axios, 10, 1)
+
   }
 
   render() {

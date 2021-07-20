@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'reactstrap';
-import {capitalizeFirstLetter} from './../functions';
+import axios from 'axios';
+import {capitalizeFirstLetter, insertLog} from './../functions';
 
 export default class CategoryList extends Component {
 
@@ -15,6 +16,8 @@ export default class CategoryList extends Component {
       categories: categories
     }
     
+    insertLog(axios, 6, 1)
+
   }
 
   componentDidMount(){
@@ -34,7 +37,7 @@ export default class CategoryList extends Component {
       let categoryName = category.name_category.length > 20 ? category.name.substring(0, 20)+'...' : category.name_category;
         return  <div className="col-xs-4 col-sm-2" key={index}>
                   <Link
-                    to={'/textes/category/'+category.id_category}
+                    to={'/categorie-edit/'+category.id_category}
                     className={this.props.classItem}
                     key={index}>
                     <div key={category.id_category} className="list-hover-item">

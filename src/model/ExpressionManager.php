@@ -5,37 +5,32 @@ use lib\Model;
 
 class ExpressionManager extends Model {
 
-    public function getRecordExpressions($id_user, $id_text){
+    public function getRecordExpressions($id_user){
 
         try {
 
             $this->dbh->beginTransaction();
 
-            $sql = "SELECT * FROM bl_record_expression WHERE fk_id_user = :id_user";
+            $sql = "SELECT * 
+                    FROM bl_record_expression as a
+                    INNER JOIN bl_expression as b
+                    ON b.id_expression = a.fk_id_expression
+                    WHERE fk_id_user = :id_user
+                    AND deleted = 0";
 
             $req = $this->dbh->prepare($sql);
             $req->bindValue(':id_user', $id_user);
             $req->execute();
             $record_expressions = $req->fetchAll(\PDO::FETCH_ASSOC);
-            if ($record_expressions) {
-                $sql = "SELECT * FROM bl_expression WHERE id_expression = :fk_id_expression";
-                
-                foreach($record_expressions as &$record_expression){
 
-                    $req = $this->dbh->prepare($sql);
-                    $req->bindValue(':fk_id_expression', $record_expression['fk_id_expression']);
-                    $req->execute();
-                    $result = $req->fetch(\PDO::FETCH_ASSOC);
-                    $record_expression['expression'] = $result;
-                }
-                // $record_expressions = $result;
+            if($record_expressions){
+                $return = $record_expressions;
             }else{
-                $record_expressions = [];
+                $return = [];
             }
-
             $this->dbh->commit();
 
-            return $record_expressions;
+            return $return;
             
         } catch (PDOException $e) {
             $this->dbh->rollback();
@@ -53,7 +48,7 @@ class ExpressionManager extends Model {
             $sql = "SELECT * FROM bl_expression WHERE english_value = :english_value";
 
             $req = $this->dbh->prepare($sql);
-            $req->bindValue(':english_value', $english_value);
+            $req->bindValue(':english_value', trim(html_entity_decode($_POST['english_value'])) );
             $req->execute();
             $expression = $req->fetchAll(\PDO::FETCH_ASSOC);
 
@@ -80,7 +75,7 @@ class ExpressionManager extends Model {
 
             $this->dbh->beginTransaction();
 
-            $sql = "SELECT * FROM bl_record_expression WHERE fk_id_expression = :id_expression";
+            $sql = "SELECT * FROM bl_record_expression WHERE fk_id_expression = :id_expression AND deleted = 0";
 
             $req = $this->dbh->prepare($sql);
             $req->bindValue(':id_expression', $id_expression);
@@ -125,6 +120,8 @@ class ExpressionManager extends Model {
                 $retour = false;
             }
 
+            $this->insertLog('text-view', 2, 'Ajout d\'une nouvelle expression d\'id : '.$this->dbh->lastInsertId());
+
             $this->dbh->commit();
 
             return $retour;
@@ -142,10 +139,11 @@ class ExpressionManager extends Model {
 
             $this->dbh->beginTransaction();
 
-            $sql = "INSERT INTO `bl_record_expression`(`created_at`, `updated_at`, `fk_id_expression`, `fk_id_text`, `fk_id_serie`, `fk_id_user`) 
-                    VALUES (:created_at, :updated_at, :fk_id_expression, :fk_id_text, :fk_id_serie, :fk_id_user)";
+            $sql = "INSERT INTO `bl_record_expression`(`user_value`, `created_at`, `updated_at`, `fk_id_expression`, `fk_id_text`, `fk_id_serie`, `fk_id_user`) 
+                    VALUES (:user_value, :created_at, :updated_at, :fk_id_expression, :fk_id_text, :fk_id_serie, :fk_id_user)";
 
             $req = $this->dbh->prepare($sql);
+            $req->bindValue(':user_value', $data['french_value']);
             $req->bindValue(':created_at', time());
             $req->bindValue(':updated_at', time());
             $req->bindValue(':fk_id_expression', $data['id_expression']);
@@ -159,47 +157,7 @@ class ExpressionManager extends Model {
                 $retour = false;
             }
 
-            $this->dbh->commit();
-
-            return $retour;
-            
-        } catch (PDOException $e) {
-            $this->dbh->rollback();
-            return false;
-        }
-
-    }
-
-    public function getSeriesByText($id_text, $id_user){
-
-        try {
-
-            $this->dbh->beginTransaction();
-
-            $sql = "SELECT * FROM `bl_serie` WHERE fk_id_text = :id_text AND fk_id_user = :id_user";
-
-            $req = $this->dbh->prepare($sql);
-            $req->bindValue(':id_text', $id_text);
-            $req->bindValue(':id_user', $id_user);
-            $req->execute();
-            $series = $req->fetchAll(\PDO::FETCH_ASSOC);
-            if ($series) {
-                $sql = "SELECT * 
-                        FROM bl_record_expression as a
-                        INNER JOIN bl_expression as b
-                        ON b.id_expression  = a.fk_id_expression
-                        WHERE fk_id_serie = :id_serie";
-                foreach($series as &$serie){
-                    $req = $this->dbh->prepare($sql);
-                    $req->bindValue(':id_serie', $serie['id_serie']);
-                    $req->execute();
-                    $expressions = $req->fetchAll(\PDO::FETCH_ASSOC);
-                    $serie['expressions'] = $expressions;
-                }
-                $retour = $series;
-            }else{
-                $retour = [];
-            }
+            $this->insertLog('text-view', 2, 'Ajout d\'une nouvelle expression utilisateur enregistrée d\'id : '.$this->dbh->lastInsertId());
 
             $this->dbh->commit();
 
@@ -231,6 +189,101 @@ class ExpressionManager extends Model {
             }else{
                 $retour = false;
             }
+
+            $this->insertLog('text-view', 2, 'Créaction d\'une nouvelle série');
+
+            $this->dbh->commit();
+
+            return $retour;
+            
+        } catch (PDOException $e) {
+            $this->dbh->rollback();
+            return false;
+        }
+
+    }
+
+    public function deleteRecordExpression($id_record_expression, $id_user){
+
+        try {
+
+            $this->dbh->beginTransaction();
+
+            $sql = "UPDATE `bl_record_expression` SET `deleted`= 1 WHERE id_record_expression = :id_record_expression AND fk_id_user = :fk_id_user";
+
+            $req = $this->dbh->prepare($sql);
+            $req->bindValue(':id_record_expression', $id_record_expression);
+            $req->bindValue(':fk_id_user', $id_user);
+            $result = $req->execute();
+            if ($result) {
+                $retour = true;
+            }else{
+                $retour = false;
+            }
+
+            $this->insertLog('list_expression', 4, 'Suppression d\'une expression utilisateur enregistrée');
+
+            $this->dbh->commit();
+
+            return $retour;
+            
+        } catch (PDOException $e) {
+            $this->dbh->rollback();
+            return false;
+        }
+
+    }
+    
+    public function deleteRecordExpressionsChecked($id_record_expressions, $id_user){
+
+        try {
+
+            $this->dbh->beginTransaction();
+
+            $sql = "UPDATE `bl_record_expression` SET `deleted`= 1 WHERE id_record_expression IN (".$id_record_expressions.") AND fk_id_user = :fk_id_user";
+
+            $req = $this->dbh->prepare($sql);
+            $req->bindValue(':fk_id_user', $id_user);
+            $result = $req->execute();
+            if ($result) {
+                $retour = true;
+            }else{
+                $retour = false;
+            }
+
+            $this->insertLog('list_expression', 4, 'Suppression de plusieurs expressions utilisateur enregistrées');
+
+            $this->dbh->commit();
+
+            return $retour;
+            
+        } catch (PDOException $e) {
+            $this->dbh->rollback();
+            return false;
+        }
+
+    }
+
+    public function updateRecordExpressionsSelected($id_record_expression, $french_value, $id_user){
+
+        try {
+
+            $this->dbh->beginTransaction();
+
+            $sql = "UPDATE `bl_record_expression` SET `user_value`= :user_value WHERE id_record_expression = :id_record_expression AND fk_id_user = :fk_id_user";
+
+            $req = $this->dbh->prepare($sql);
+            $req->bindValue(':user_value', $french_value);
+            $req->bindValue(':id_record_expression', $id_record_expression);
+            $req->bindValue(':fk_id_user', $id_user);
+            $result = $req->execute();
+            if ($result) {
+                $retour = true;
+            }else{
+                $retour = false;
+            }
+
+            $this->insertLog('list_expression', 3, 'Mise à jour d\'une expression utilisateur enregistrée d\'id : '.$id_record_expression);
 
             $this->dbh->commit();
 

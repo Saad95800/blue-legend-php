@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import ReactCountdownClock from 'react-countdown-clock';
-import {capitalizeFirstLetter} from './../functions';
+import {capitalizeFirstLetter, replaceSpecialChar, insertLog} from './../functions';
 
 export default class serieRevision extends Component {
 
@@ -47,6 +47,7 @@ export default class serieRevision extends Component {
       this._handleResetClick = this._handleResetClick.bind(this);
     }
 
+    insertLog(axios, 14, 1)
     
   }
 
@@ -77,7 +78,7 @@ export default class serieRevision extends Component {
   validate(){
     this._handleStopClick();
     if(this.state.stepRev == 'Question'){
-      let res = this.state.expressions[this.state.numQuestion].french_value.toLowerCase().trim() == document.querySelector("#inputResponse").value.toLowerCase().trim();
+      let res = replaceSpecialChar(this.state.expressions[this.state.numQuestion].french_value.toLowerCase().trim()) == replaceSpecialChar(document.querySelector("#inputResponse").value.toLowerCase().trim());
       let last = (this.state.numQuestion == this.state.expressions.length - 1);
       let msg = "Suivant";
       if(last){

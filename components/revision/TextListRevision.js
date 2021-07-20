@@ -2,11 +2,17 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import {Row} from 'reactstrap';
 import {capitalizeFirstLetter} from './../functions';
+import {root} from './../setup'
+import axios from 'axios';
+import {insertLog} from './../functions';
 
 export default class TextListRevision extends Component {
 
   constructor(props){
     super(props);
+
+    insertLog(axios, 15, 1)
+
   }
 
   render() {
@@ -16,6 +22,11 @@ export default class TextListRevision extends Component {
       textes = this.props.data.textes.map((texte, index) => {
         let link = '/revision-serie-list/text/'+texte.id_text;
         let textTitle = texte.title_text.length > 20 ? texte.title_text.substring(0, 20)+'...' : texte.title_text;
+        let cssItem = {}
+        let folder = texte.file_name_server.replace('.pdf', '')
+        if(texte.type_text == 'pdf'){
+          cssItem = {boxShadow: '0px 0px 10px 0px grey', background: 'url('+root+'/public/uploads/'+folder+'/html/'+folder+'001.png'+') no-repeat', backgroundSize: '100%'}
+        }
         return  <div className="col-xs-4 col-sm-2" key="index">
                   <Link
                     to={link}
@@ -23,7 +34,7 @@ export default class TextListRevision extends Component {
                     <div key={texte.id_text} className="list-hover-item">
                       <div className="display-flex-center" style={{textAlign: 'center', height: '40px'}}>{ capitalizeFirstLetter(textTitle) }</div>
                       <div style={{'textAlign': 'center'}}>
-                      <span className="img-item-liste-texte"></span>
+                      <span className="img-item-liste-texte" style={cssItem}></span>
                       </div>
                     </div>
                   </Link>

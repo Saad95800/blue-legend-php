@@ -148,6 +148,26 @@ class Model {
         }
     }    
     
+    public function insertLog($page_log, $id_type_log, $comment = ''){
+
+        $sql = "INSERT INTO `bl_log_user`(`page_log`, `date`, `fk_id_type_log`, `comment`, `fk_id_user`) VALUES (:page_log, :date, :fk_id_type_log, :comment, :fk_id_user)";
+        $req = $this->dbh->prepare($sql);
+        $req->bindValue(':page_log', $page_log);
+        $req->bindValue(':date', time());
+        $req->bindValue(':fk_id_type_log', $id_type_log);
+        $req->bindValue(':comment', $comment);
+        $req->bindValue(':fk_id_user', $_SESSION['id_user']);
+        $result = $req->execute();
+
+        if($result){
+            $return = true;
+        }else{
+            $return = false;
+        }
+
+        return $return;
+    }
+
     public function getDateNow() {
         $sql = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as now";
         $req = $this->dbh->prepare($sql);

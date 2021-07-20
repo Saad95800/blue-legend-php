@@ -44,15 +44,15 @@ class SerieManager extends Model {
             $this->dbh->beginTransaction();
 
 
-            $sql = "SELECT count(fk_id_expression) as nb FROM bl_data_serie WHERE created_at > :today_midnight AND result = 1 AND fk_id_user = :id_user GROUP BY fk_id_expression";
-
+            $sql = "SELECT fk_id_expression FROM bl_data_serie WHERE created_at > :today_midnight AND result = 1 AND fk_id_user = :id_user GROUP BY fk_id_expression";
+            
             $req = $this->dbh->prepare($sql);
             $req->bindValue(':today_midnight', strtotime('today midnight'));
             $req->bindValue(':id_user', $id_user);
             $req->execute();
-            $result = $req->fetch(\PDO::FETCH_ASSOC);
+            $result = $req->fetchAll(\PDO::FETCH_ASSOC);
             if ($result) {
-                $nbExprApprisToday = $result['nb'];
+                $nbExprApprisToday = count($result);
             }else{
                 $nbExprApprisToday = 0;
             }
@@ -76,14 +76,14 @@ class SerieManager extends Model {
             $this->dbh->beginTransaction();
 
 
-            $sql = "SELECT count(fk_id_expression) as nb FROM bl_data_serie WHERE result = 1 AND fk_id_user = :id_user GROUP BY fk_id_expression";
+            $sql = "SELECT fk_id_expression FROM bl_data_serie WHERE result = 1 AND fk_id_user = :id_user GROUP BY fk_id_expression";
 
             $req = $this->dbh->prepare($sql);
             $req->bindValue(':id_user', $id_user);
             $req->execute();
-            $result = $req->fetch(\PDO::FETCH_ASSOC);
+            $result = $req->fetchAll(\PDO::FETCH_ASSOC);
             if ($result) {
-                $nbExprApprisToday = $result['nb'];
+                $nbExprApprisToday = count($result);
             }else{
                 $nbExprApprisToday = 0;
             }
@@ -178,17 +178,35 @@ class SerieManager extends Model {
             $req->bindValue(':id_user', $id_user);
             $req->bindValue(':id_text', $id_text);
             $req->execute();
-            $result = $req->fetchAll(\PDO::FETCH_ASSOC);
-            if ($result) {
-                $series = $result;
+            $series = $req->fetchAll(\PDO::FETCH_ASSOC);
+            $newSeries = [];
+            
+            if ($series){
+                $sql = "SELECT * 
+                        FROM bl_record_expression as a
+                        INNER JOIN bl_expression as b
+                        ON b.id_expression  = a.fk_id_expression
+                        WHERE fk_id_serie = :id_serie
+                        AND a.deleted = 0";
+                foreach($series as &$serie){
+                    $req = $this->dbh->prepare($sql);
+                    $req->bindValue(':id_serie', $serie['id_serie']);
+                    $req->execute();
+                    $expressions = $req->fetchAll(\PDO::FETCH_ASSOC);
+                    $serie['expressions'] = $expressions;
+                    if(count($expressions) > 0){
+                        $newSeries[] = $serie;
+                    }
+                }
+                $retour = $newSeries;
             }else{
-                $series = [];
+                $retour = [];
             }
 
             $this->dbh->commit();
 
             
-            return $series;
+            return $retour;
             
         } catch (PDOException $e) {
             $this->dbh->rollback();
@@ -236,6 +254,53 @@ class SerieManager extends Model {
 
             
             return $serie;
+            
+        } catch (PDOException $e) {
+            $this->dbh->rollback();
+            return false;
+        }
+
+    }
+
+    public function getSeriesByUser($id_user){
+
+        try {
+
+            $this->dbh->beginTransaction();
+
+            // Récupération du nombre total de séries réalisés
+            $sql = "SELECT * 
+                    FROM bl_serie as a 
+                    LEFT JOIN bl_text as b 
+                    on b.id_text = a.fk_id_text 
+                    WHERE a.fk_id_user = :id_user 
+                    AND a.fk_id_text IS NOT NULL";
+    
+            $req = $this->dbh->prepare($sql);
+            $req->bindValue(':id_user', $id_user);
+            $req->execute();
+            $series = $req->fetchAll(\PDO::FETCH_ASSOC);
+
+            if($series){
+                $sql = "SELECT * FROM bl_record_expression WHERE fk_id_serie = :id_serie AND deleted = 0";
+                $newSeries = [];
+                foreach($series as $serie){
+                    $req = $this->dbh->prepare($sql);
+                    $req->bindValue(':id_serie', $serie['id_serie']);
+                    $req->execute();
+                    $expressions = $req->fetchAll(\PDO::FETCH_ASSOC);
+                    if(count($expressions) > 0){
+                        $newSeries[] = $serie;
+                    }
+                }
+                $series = $newSeries;              
+            }else{
+                $series = [];
+            }
+
+            $this->dbh->commit();
+
+            return $series;
             
         } catch (PDOException $e) {
             $this->dbh->rollback();
@@ -353,4 +418,51 @@ class SerieManager extends Model {
 
     }
 
+    public function getSeriesByText($id_text, $id_user){
+
+        try {
+
+            $this->dbh->beginTransaction();
+
+            $sql = "SELECT * FROM `bl_serie` WHERE fk_id_text = :id_text AND fk_id_user = :id_user";
+
+            $req = $this->dbh->prepare($sql);
+            $req->bindValue(':id_text', $id_text);
+            $req->bindValue(':id_user', $id_user);
+            $req->execute();
+            $series = $req->fetchAll(\PDO::FETCH_ASSOC);
+            $newSeries = [];
+            
+            if ($series) {
+                $sql = "SELECT * 
+                        FROM bl_record_expression as a
+                        INNER JOIN bl_expression as b
+                        ON b.id_expression  = a.fk_id_expression
+                        WHERE fk_id_serie = :id_serie
+                        AND a.deleted = 0";
+                foreach($series as &$serie){
+                    $req = $this->dbh->prepare($sql);
+                    $req->bindValue(':id_serie', $serie['id_serie']);
+                    $req->execute();
+                    $expressions = $req->fetchAll(\PDO::FETCH_ASSOC);
+                    $serie['expressions'] = $expressions;
+                    if(count($expressions) > 0){
+                        $newSeries[] = $serie;
+                    }
+                }
+                $retour = $newSeries;
+            }else{
+                $retour = [];
+            }
+
+            $this->dbh->commit();
+
+            return $retour;
+            
+        } catch (PDOException $e) {
+            $this->dbh->rollback();
+            return false;
+        }
+
+    }
 }

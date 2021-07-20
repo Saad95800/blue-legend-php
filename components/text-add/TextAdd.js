@@ -6,6 +6,7 @@ import { Redirect } from 'react-router'
 import { Container, Row, Col, FormGroup, Label, Input } from 'reactstrap'
 import slugify from 'slugify'
 import {root} from './../setup'
+import {isURL, insertLog} from './../functions'
 
 export default class TextAdd extends Component {
 
@@ -19,15 +20,22 @@ export default class TextAdd extends Component {
       wysiwyg_content: '',
       selected_category: '',
       wysiwyg_bg_color: '',
-      type_text: 'text',
+      type_text: 'pdf',
       file_name_pdf: '',
       file_name_pdf_server: '',
       view_pdf: false,
       inputFileTitle: 'Choisir un fichier',
       text_link: '',
       file_html: '',
-      id_file: ''
+      id_file: '',
+      file_name_server_link: '',
+      url_file_link: '',
+      view_iframe_link_display: 'none',
+      url_file_link_loaded: false,
+      text_link_loaded: false
     }
+
+    insertLog(axios, 1, 1)
 
   }
 
@@ -37,24 +45,24 @@ export default class TextAdd extends Component {
       this.setState({inputFileTitle: this.state.file_name_pdf});
     }
 
-    this.textarea = $("react-trumbowyg"); 
-    this.textAreaWysiwyg = document.getElementsByName("react-trumbowyg")[0];
+    this.textarea = $("#react-trumbowyg"); 
+    this.textAreaWysiwyg = document.getElementsByName("#react-trumbowyg")[0];
     this.divWysiwyg = document.querySelector("#react-trumbowyg");
     this.inputTitleText = document.querySelector("#title-text");
     this.selectCategory = document.querySelector("#select-category-text");
     this.typeText = document.querySelector("#type-text");
 
-    this.setState({
-      wysiwyg_content: document.getElementsByName("react-trumbowyg")[0].value,
-      wysiwyg_bg_color: document.querySelector("#react-trumbowyg").style.backgroundColor
-    });
+    // this.setState({
+    //   wysiwyg_content: document.getElementsByName("react-trumbowyg")[0].value,
+    //   wysiwyg_bg_color: document.querySelector("#react-trumbowyg").style.backgroundColor
+    // });
 
-    this.divWysiwyg.addEventListener("paste", () => {
-      this.setState({wysiwyg_content: this.textAreaWysiwyg.value});
-    });
-    this.divWysiwyg.addEventListener("keyup", () => {
-      this.setState({wysiwyg_content: this.textAreaWysiwyg.value});
-    });
+    // this.divWysiwyg.addEventListener("paste", () => {
+    //   this.setState({wysiwyg_content: this.textAreaWysiwyg.value});
+    // });
+    // this.divWysiwyg.addEventListener("keyup", () => {
+    //   this.setState({wysiwyg_content: this.textAreaWysiwyg.value});
+    // });
 
     axios({
       method: 'post',
@@ -88,11 +96,17 @@ export default class TextAdd extends Component {
         setTimeout(function(){divWysiwyg.style.backgroundColor = '#fff';}, 3000);
         return;
       }    
-    }else{
+    }else if(this.state.type_text == 'pdf'){
       if(this.state.file_name_pdf_server == ''){
         this.props.viewMessageFlash('Vous devez choisir un fichier.', true);
         return;
       }
+    }else if(this.state.text_link == ''){
+      this.props.viewMessageFlash('Vous devez saisir une URL.', true);
+      return;
+    }else if(this.state.text_link_loaded == false){
+      this.props.viewMessageFlash('Vous devez charger l\'URL saisie', true);
+      return;
     }
 
     let formdata = new FormData()
@@ -105,6 +119,8 @@ export default class TextAdd extends Component {
     formdata.append('file_html', this.state.file_html)
     formdata.append('id_file', this.state.id_file)
     formdata.append('slug', slugify(this.state.wysiwyg_title))
+    formdata.append('file_name_server_link', this.state.file_name_server_link)
+    // formdata.append('url_file_link', this.state.url_file_link)
 
     axios({
       method: 'POST',
@@ -179,25 +195,61 @@ export default class TextAdd extends Component {
 
   }
 
-  viewPageContent(link){
+  savePageContent(){
 
-    axios({
-      method: 'GET',
-      url: '/get-html-page',
-      responseType: 'html',
-      // headers: {
-      //   'Content-Type': 'application/x-www-form-urlencoded'
-      // },
-      data: {}
-    })
-    .then((response) => {
-      console.log(response);
-      // $("#react-trumbowyg").html(response.data)
-    })
-    .catch( (error) => {
-      console.log(error);
-    });
+    if(isURL(this.state.text_link)){
 
+      let formdata = new FormData()
+      formdata.append('url', this.state.text_link)
+      axios({
+        method: 'POST',
+        url: '/save-html-page',
+        responseType: 'html',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data: formdata
+      })
+      .then((response) => {
+        console.log(response);
+        if(response.data.error == false){
+          this.setState({
+            file_name_server_link: response.data.file_name_server,
+            url_file_link: response.data.url,
+            view_iframe_link_display: 'block',
+            text_link_loaded: true
+          })
+        }else{
+          this.props.viewMessageFlash('Erreur de traitement', true)
+        }
+        // $("#react-trumbowyg").html(response.data)
+      })
+      .catch( (error) => {
+        console.log(error);
+      });
+    }else{
+      this.props.viewMessageFlash('Veuillez saisir une url valide', true)
+    }
+
+
+  }
+
+  setSelectionRange(input, selectionStart, selectionEnd) {
+    if (input.setSelectionRange) {
+      input.focus();
+      input.setSelectionRange(selectionStart, selectionEnd);
+    }
+    else if (input.createTextRange) {
+      var range = input.createTextRange();
+      range.collapse(true);
+      range.moveEnd('character', selectionEnd);
+      range.moveStart('character', selectionStart);
+      range.select();
+    }
+  }
+  
+  setCaretToPos(input, pos) {
+     this.setSelectionRange(input, pos, pos);
   }
 
   render() {
@@ -211,47 +263,19 @@ export default class TextAdd extends Component {
     let options = this.state.categories.map((category, index) =>{
                     return <option key={index} value={category.id_category}>{category.name_category}</option>
                   });
-    let classBtnTypeText = "btn btn-choice-file display-flex-center btn-primary btn-sm active";
-    let classBtnTypePdf = "btn btn-choice-file display-flex-center btn-primary btn-sm notActive";
+    
+    let classBtnTypePdf = "btn btn-choice-file display-flex-center btn-primary btn-sm active";
+    let classBtnTypeText = "btn btn-choice-file display-flex-center btn-primary btn-sm notActive";
+    let classBtnTypeLink = "btn btn-choice-file display-flex-center btn-primary btn-sm notActive"
 
-    let contentForm =               
-            <div className="container-wysiwig" style={{backgroundColor: this.state.wysiwyg_bg_color}}>
-              <Trumbowyg id='react-trumbowyg'
-                        onChange={() =>{
-                          console.log(this.textAreaWysiwyg.value);
-                          this.setState({wysiwyg_content: this.textAreaWysiwyg.value});
-                          let val = this.textarea.val();
-                          this.textarea.focus().val("").val(val);
-                        }} 
-                        onPaste={() =>{
-                          console.log(this.textAreaWysiwyg.value);
-                          this.setState({wysiwyg_content: this.textAreaWysiwyg.value});
-                          let val = this.textarea.val();
-                          this.textarea.focus().val("").val(val);
-                        }} 
-                        buttons={
-                            [
-                                ['viewHTML'],
-                                ['formatting'],
-                                'btnGrp-semantic',
-                                ['link'],
-                                ['insertImage'],
-                                'btnGrp-justify',
-                                'btnGrp-lists',
-                                ['table'], // I ADDED THIS FOR THE TABLE PLUGIN BUTTON
-                                ['fullscreen']
-                            ]
-                        }
-                        data={this.state.wysiwyg_content}
-                        placeholder='Entrez votre texte'
-                        ref="trumbowyg"
-              />
-
-          </div>
+    let contentForm = []         
     
     if(this.state.type_text == 'pdf'){
-      classBtnTypeText = "btn btn-choice-file display-flex-center btn-primary btn-sm notActive";
+      
       classBtnTypePdf = "btn btn-choice-file display-flex-center btn-primary btn-sm active";
+      classBtnTypeLink = "btn btn-choice-file display-flex-center btn-primary btn-sm notActive"
+      classBtnTypeText = "btn btn-choice-file display-flex-center btn-primary btn-sm notActive";
+
       let contentBtnFile = this.state.inputFileTitle;
       if(this.state.pdf_loading){
         contentBtnFile = <img src={root+"/public/img/Rolling-1s-80px.gif"} style={{width: '40px', marginTop: '-10px'}} />
@@ -275,6 +299,78 @@ export default class TextAdd extends Component {
           </div>
         </div>
       </div>
+    }else if(this.state.type_text == 'link'){
+
+      classBtnTypePdf = "btn btn-choice-file display-flex-center btn-primary btn-sm notActive";
+      classBtnTypeLink = "btn btn-choice-file display-flex-center btn-primary btn-sm active"
+      classBtnTypeText = "btn btn-choice-file display-flex-center btn-primary btn-sm notActive";
+
+      let fnsl = this.state.file_name_server_link
+      let src = root+'public/uploads/links/'+fnsl;
+
+      contentForm =   <Row>
+                        <Col sm="12">
+                          <Label for="title-text">Ajouter un lien</Label>
+                          <FormGroup row>
+                            <Col sm={12}>
+                              <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '80%'}}>
+                                <Input type="text" style={{width: '85%'}} value={this.state.text_link} onChange={() => {
+                                  this.setState({text_link: $("#text-link").val()})
+                                  }} autoComplete="off" id="text-link" />
+                                  <div className="btn-forms" style={{height: '38px', padding: '6px 0px', backgroundColor: '#3B74FE'}} onClick={() => {this.savePageContent()}}>Charger</div>                                
+                              </div>
+                              <div>
+                                <iframe
+                                  id="iframe-pdf" 
+                                  data-texte={JSON.stringify(this.state.texte)}
+                                  src={src}
+                                  style={{display: this.state.view_iframe_link_display, width: '100%', height: '500px', marginTop: '15px'}}
+                                  ></iframe>
+                              </div>
+                            </Col>
+                          </FormGroup>
+                        </Col>
+                      </Row>
+    }else if(this.state.type_text == 'text'){
+
+      classBtnTypePdf = "btn btn-choice-file display-flex-center btn-primary btn-sm notActive";
+      classBtnTypeLink = "btn btn-choice-file display-flex-center btn-primary btn-sm notActive"
+      classBtnTypeText = "btn btn-choice-file display-flex-center btn-primary btn-sm active";
+
+      contentForm =               
+      <div className="container-wysiwig" style={{backgroundColor: this.state.wysiwyg_bg_color}}>
+        <Trumbowyg id="react-trumbowyg"
+                  onChange={() =>{
+                    console.log(document.getElementsByName("react-trumbowyg")[0].value);
+                    this.setState({wysiwyg_content: document.getElementsByName("react-trumbowyg")[0].value});
+                    let val = $("#react-trumbowyg").val();
+                    this.setCaretToPos($("#react-trumbowyg"), 8)
+                  }} 
+                  onPaste={() =>{
+                    console.log(this.textAreaWysiwyg.value);
+                    this.setState({wysiwyg_content: this.textAreaWysiwyg.value});
+                    let val = this.textarea.val();
+                    this.textarea.focus().val("").val(val);
+                  }} 
+                  buttons={
+                      [
+                          ['viewHTML'],
+                          ['formatting'],
+                          'btnGrp-semantic',
+                          ['link'],
+                          ['insertImage'],
+                          'btnGrp-justify',
+                          'btnGrp-lists',
+                          ['table'], // I ADDED THIS FOR THE TABLE PLUGIN BUTTON
+                          ['fullscreen']
+                      ]
+                  }
+                  data={this.state.wysiwyg_content}
+                  placeholder='Entrez votre texte'
+                  ref="trumbowyg"
+        />
+
+    </div>
     }
 
     return (
@@ -315,19 +411,6 @@ export default class TextAdd extends Component {
             </Row>
             <Row>
               <Col sm="12">
-                <Label for="title-text">Ajouter un lien</Label>
-                <FormGroup row>
-                  <Col sm={12}>
-                    <Input type="text" value={this.state.text_link} onChange={() => {
-                      this.setState({text_link: $("#text-link").val()})
-                      this.viewPageContent($("#text-link").val())
-                      }} autoComplete="off" id="text-link" />
-                  </Col>
-                </FormGroup>
-              </Col>
-            </Row>
-            <Row>
-              <Col sm="12">
                 <Label for="title-text">Type du texte</Label>
                 <FormGroup row>
                   <Col sm={12}>
@@ -336,18 +419,25 @@ export default class TextAdd extends Component {
                         <div className="input-group">
                           <div id="radioBtn" className="btn-group">
                             <a 
-                              className={classBtnTypeText}
-                              data-toggle="type" 
-                              data-title="text"
-                              onClick={() => {this.changeTypeText('text')}}>
-                                Texte
-                            </a>
-                            <a 
                               className={classBtnTypePdf}
                               data-toggle="type" 
                               data-title="pdf"
                               onClick={() => {this.changeTypeText('pdf')}}>
                                 PDF
+                            </a>
+                            <a 
+                              className={classBtnTypeLink}
+                              data-toggle="type" 
+                              data-title="link"
+                              onClick={() => {this.changeTypeText('link')}}>
+                                Lien
+                            </a>
+                            <a 
+                              className={classBtnTypeText}
+                              data-toggle="type" 
+                              data-title="text"
+                              onClick={() => {this.changeTypeText('text')}}>
+                                Texte
                             </a>
                           </div>
                           <input type="hidden" name="happy" id="happy"/>
@@ -365,7 +455,9 @@ export default class TextAdd extends Component {
             </div> */}
             <Row>
             <Col sm="12">
+
               {contentForm}
+              
             </Col>
             </Row>
             </div>
