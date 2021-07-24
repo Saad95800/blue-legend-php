@@ -156,7 +156,7 @@ class Model {
         $req->bindValue(':date', time());
         $req->bindValue(':fk_id_type_log', $id_type_log);
         $req->bindValue(':comment', $comment);
-        $req->bindValue(':fk_id_user', $_SESSION['id_user']);
+        $req->bindValue(':fk_id_user', null);
         $result = $req->execute();
 
         if($result){

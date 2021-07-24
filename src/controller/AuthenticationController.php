@@ -23,7 +23,7 @@ class AuthenticationController extends Controller {
 
         $um = new UserManager();
         $user = $um->getUserByEmail($_POST['email']);
-        
+
         if($user == false){
             echo json_encode([
                 'error' => true,

@@ -141,11 +141,9 @@ export default class NavBar extends Component {
     })
     .then((response) => {
       console.log(response);
-      if(response.statusText == 'OK'){
         this.setState({
           username: response.data.name_user
         });
-      }
     })
     .catch( (error) => {
       console.log(error);

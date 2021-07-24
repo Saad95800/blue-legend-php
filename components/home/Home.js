@@ -36,7 +36,6 @@ export default class Home extends Component {
       })
       .then((response) => {
         console.log(response);
-        if(response.statusText == 'OK'){
           this.setState({
             nbSeriesToday: response.data.nbSeriesToday, 
             nbSerieRealiseesToday: response.data.nbSerieRealiseesToday,
@@ -44,7 +43,6 @@ export default class Home extends Component {
             nbMotsExprApprisToday: response.data.nbMotsExprApprisToday,
             nbMotsExprTotalAppris: response.data.nbMotsExprTotalAppris
           });
-        }
       })
       .catch( (error) => {
         console.log(error);

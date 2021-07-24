@@ -169,7 +169,7 @@ export default class TextAdd extends Component {
     })
     .then((response) => {
       console.log(response);
-      if(response.data.result){
+      if(response.data.error == false){
         this.props.viewMessageFlash(response.data.msg);
         this.setState(
           { 
@@ -182,6 +182,9 @@ export default class TextAdd extends Component {
             file_html: response.data.file_html,
             id_file: response.data.file.file_name_pdf_server.replace(".pdf", "")
         });
+      }else{
+        this.props.viewMessageFlash(response.data.msg, response.data.error);
+        this.setState({inputFileTitle: 'Choisir un fichier', pdf_loading: false})
       }
 
     })

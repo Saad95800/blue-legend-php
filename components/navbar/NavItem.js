@@ -21,9 +21,7 @@ export default class NavItem extends Component {
       })
       .then((response) => {
         console.log(response);
-        if(response.statusText == 'OK'){
-          window.location.href = '/';
-        }
+        window.location.href = '/';
       })
       .catch( (error) => {
         console.log(error);

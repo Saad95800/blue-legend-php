@@ -1,9 +1,9 @@
 <?php
 
 return array(
-    "db_name"=> "reactiveitsaad",
-    "db_host"=> "reactiveitsaad.mysql.db",
-    "db_user"=> "reactiveitsaad",
-    "db_pswd"=> "Devenezriche111",
+    "db_name"=> "blue-legend",
+    "db_host"=> "localhost",
+    "db_user"=> "root",
+    "db_pswd"=> "Devenezriche111!",
 	"db_port"=> "3306"
 );

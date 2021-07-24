@@ -447,19 +447,15 @@ var ConnexionSystem = /*#__PURE__*/function (_Component) {
             }).then(function (response) {
               console.log(response);
 
-              if (response.statusText == 'OK') {
-                if (response.data.error == true) {
-                  _this3.viewMessageFlash(response.data.msg, true);
-                } else {
-                  window.localStorage.setItem('id_user', response.data.id_user);
-                  window.localStorage.setItem('date_connexion', Date.now());
-
-                  _this3.viewMessageFlash(response.data.msg, false, false);
-
-                  document.location.href = "/app";
-                }
+              if (response.data.error == true) {
+                _this3.viewMessageFlash(response.data.msg, true);
               } else {
-                _this3.viewMessageFlash('Erreur lors de la création de l\'utilisateur', true);
+                window.localStorage.setItem('id_user', response.data.id_user);
+                window.localStorage.setItem('date_connexion', Date.now());
+
+                _this3.viewMessageFlash(response.data.msg, false, false);
+
+                document.location.href = "/app";
               }
             })["catch"](function (error) {
               console.log(error);
@@ -496,19 +492,15 @@ var ConnexionSystem = /*#__PURE__*/function (_Component) {
         }).then(function (response) {
           console.log(response);
 
-          if (response.statusText == 'OK') {
-            if (response.data.error == true) {
-              _this4.viewMessageFlash(response.data.msg, true);
-            } else {
-              window.localStorage.setItem('id_user', response.data.id_user);
-              window.localStorage.setItem('date_connexion', Date.now());
-
-              _this4.viewMessageFlash(response.data.msg, false, false);
-
-              document.location.href = "/app";
-            }
+          if (response.data.error == true) {
+            _this4.viewMessageFlash(response.data.msg, true);
           } else {
-            _this4.viewMessageFlash('Erreur lors de la tentative de connexion', true);
+            window.localStorage.setItem('id_user', response.data.id_user);
+            window.localStorage.setItem('date_connexion', Date.now());
+
+            _this4.viewMessageFlash(response.data.msg, false, false);
+
+            document.location.href = "/app";
           }
         })["catch"](function (error) {
           console.log(error);
@@ -634,6 +626,8 @@ var ConnexionSystem = /*#__PURE__*/function (_Component) {
           type: "email",
           value: this.state.siretLogin,
           onChange: function onChange() {
+            console.log(document.querySelector("#email-input").value);
+
             _this5.setState({
               email: document.querySelector("#email-input").value
             });
@@ -709,11 +703,12 @@ var ConnexionSystem = /*#__PURE__*/function (_Component) {
 /*!*********************************!*\
   !*** ./components/functions.js ***!
   \*********************************/
-/*! exports provided: timeConverter, getDate, getHour, checkPassword, capitalizeFirstLetter, ucFirst, limit20str, limit15str, replaceSpecialChar, isURL */
+/*! exports provided: insertLog, timeConverter, getDate, getHour, checkPassword, capitalizeFirstLetter, ucFirst, limit20str, limit15str, replaceSpecialChar, isURL */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "insertLog", function() { return insertLog; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "timeConverter", function() { return timeConverter; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getDate", function() { return getDate; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getHour", function() { return getHour; });
@@ -730,7 +725,21 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-function insertLog() {}
+function insertLog(axios, page_log, id_type_log) {
+  var formdata = new FormData();
+  formdata.append('page_log', page_log);
+  formdata.append('id_type_log', id_type_log);
+  axios({
+    method: 'post',
+    url: '/insert-log-ajax',
+    responseType: 'json',
+    data: formdata
+  }).then(function (response) {
+    console.log(response);
+  })["catch"](function (error) {
+    console.log(error);
+  });
+}
 
 function timeConverter(UNIX_timestamp) {
   var a = new Date(UNIX_timestamp * 1000);

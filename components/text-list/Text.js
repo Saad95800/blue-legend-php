@@ -24,7 +24,7 @@ export default class Text extends Component {
       type_text: '',
       active_page: 1,
       heightContainerIframePdf: '500px',
-      zoom: 1.92,
+      zoom: 1,
       fullSreenPdf: false,
       file_name_server: '',
       file_name_server_link: ''
@@ -71,8 +71,9 @@ export default class Text extends Component {
     // console.log('componentDidMount')
     // console.log($("#container-iframe-pdf"))
     // console.log(($(window).height()-130)+'px')
-    // $("#container-iframe-pdf").css('height', ($(window).height()-130)+'px')
-    this.setState({heightContainerIframePdf: ($(window).height()-130)+'px'})
+    this.setState({heightContainerIframePdf: ($(window).height()-120)+'px'})
+    $('#iframe-pdf').css('height', ($(window).height()-380)+'px')
+
   }
 
   changePage(action){
@@ -92,11 +93,15 @@ export default class Text extends Component {
   }
 
   zoonIn(){
-    this.setState({zoom: this.state.zoom + 0.06})
+    this.setState({zoom: this.state.zoom + 0.1})
+    $($('#iframe-pdf').context).find('body').css({'transform': 'scale('+this.state.zoom+')'})
+    // $('#iframe-pdf').css('height', ( ($(window).height()-380)/(this.state.zoom + 0.06) )+'px')
   }
 
   zoonOut(){
-    this.setState({zoom: this.state.zoom - 0.06})
+    this.setState({zoom: this.state.zoom - 0.1})
+    $($('#iframe-pdf').context).find('body').css({'transform': 'scale('+this.state.zoom+')'})
+    // $('#iframe-pdf').css('height', ( ($(window).height()-380)/(this.state.zoom - 0.06) )+'px')
   }
 
   fullScreenIframePdf(){
@@ -172,7 +177,7 @@ export default class Text extends Component {
         }
         let src = root+'public/uploads/'+fns+'/html/'+fns+'-'+this.state.active_page+'.html'+ancre;
         text = 
-        <div id="container-iframe-pdf" style={{height: this.state.heightContainerIframePdf}}>
+        <div id="" style={{backgroundColor: '#939393', overflowX: 'clip'}}>
           <div id="full-screen-btn" onClick={()=>{this.fullScreenIframePdf()}}
           ></div>
           <div className="container-btn-page">
@@ -188,8 +193,10 @@ export default class Text extends Component {
             data-textid={this.state.texte.id_text}
             data-id_ancre={this.state.texte.ancre_ligne}
             data-texte={JSON.stringify(this.state.texte)}
+            data-root={root}
             src={src}
-            style={{zoom: '0.75', transform: 'scale('+this.state.zoom+')', transformOrigin: '0 0'}}
+            // style={{height: this.state.heightContainerIframePdf, zoom: '0.75', transform: 'scale('+this.state.zoom+')', transformOrigin: '0 0'}}
+            style={{transform: 'scale('+this.state.zoom+')', transformOrigin: 'center top', border: 'none'}}
           ></iframe>
         </div>
       }else if(this.state.type_text == 'link'){

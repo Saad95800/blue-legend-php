@@ -1,4 +1,4 @@
-let root = "http://education.reactive-digital.fr"
+let root = "http://blue-legend.com"
 
   export {
     root

@@ -275,35 +275,35 @@ class AppController extends Controller {
                 <script src="'.URLROOT.'/public/pages/web/jquery-2.2.2.min.js"></script>
                 <script src="'.URLROOT.'/public/js/file.js"></script>
             ';
-            $add_html = '
-            <div id="id-text" style="display:none;"></div>
-            <div id="cal1">&nbsp;</div>
-            <div id="cal2">&nbsp;</div>
-            <div id="popupTrad" class="popup-trad">
-                <div class="arrow-popuptrad"></div>
-                <div id="translationPopupText" class="text-center">
-                  <div style="margin: 10px;font-weight:normal;display:none;" id="selText"></div>
-                  <textarea style="margin: 10px;font-size: 1.5em;font-weight: bold;width: 95%;border: none;overflow: hidden;font-family: cursive;" id="frenchValue"></textarea>
-                </div>
-                <div class="display-flex-center" id="container-btn-save-expression">
-                  <div id="btnSaveExpression" class="display-flex-center" style="background-color: #6592ff"></div>
-                </div>
-            </div>
-            ';
-
+            // $add_html = '
+            // <div id="id-text" style="display:none;"></div>
+            // <div id="cal1">&nbsp;</div>
+            // <div id="cal2">&nbsp;</div>
+            // <div id="popupTrad" class="popup-trad">
+            //     <div class="arrow-popuptrad"></div>
+            //     <div id="translationPopupText" class="text-center">
+            //       <div style="margin: 10px;font-weight:normal;display:none;" id="selText"></div>
+            //       <textarea style="margin: 10px;font-size: 1.5em;font-weight: bold;width: 95%;border: none;overflow: hidden;font-family: cursive;" id="frenchValue"></textarea>
+            //     </div>
+            //     <div class="display-flex-center" id="container-btn-save-expression">
+            //       <div id="btnSaveExpression" class="display-flex-center" style="background-color: #6592ff"></div>
+            //     </div>
+            // </div>
+            // ';
+// debug($_POST);
             if($_POST['type_text'] == 'pdf'){
                 for($i = 1; $i <= $nbpage; $i++){
                     $file_root = ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$_POST['id_file'].DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$_POST['id_file'].'-'.$i.'.html';
                     $texte = file_get_contents($file_root);
                     $texte = preg_replace('/\<\/head\>/', $links.'</head>', $texte, 1);
-                    $texte = preg_replace('/\<\/body\>/', $add_html.'</body>', $texte, 1);
+                    // $texte = preg_replace('/\<\/body\>/', $add_html.'</body>', $texte, 1);
                     file_put_contents($file_root, $texte);                
                 }                
             }elseif($_POST['type_text'] == 'link'){
                 $file_root = ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'links'.DIRECTORY_SEPARATOR.$_POST['file_name_server_link'];
                 $texte = file_get_contents($file_root);
                 $texte = preg_replace('/\<\/head\>/', $links.'</head>', $texte, 1);
-                $texte = preg_replace('/\<\/body\>/', $add_html.'</body>', $texte, 1);
+                // $texte = preg_replace('/\<\/body\>/', $add_html.'</body>', $texte, 1);
                 file_put_contents($file_root, $texte);      
             }
 
@@ -331,25 +331,32 @@ class AppController extends Controller {
     
     public function uploadFilePdfAjax(){
 
+        $msg = 'Echec lors du chargement du fichier';
+        $file = [];
+
         $upload_html = false;
         $file_name = uniqid();
-        mkdir("public/uploads/".$file_name, 0700);
-        mkdir("public/uploads/".$file_name."/html", 0700);
+        mkdir("public/uploads/".$file_name, 0777);
+        mkdir("public/uploads/".$file_name."/html", 0777);
         $target_dir = "public/uploads/".$file_name."/";
         $target_file = $target_dir . $file_name . '.pdf';
 
-        if($_FILES["file"]["type"] != 'application/pdf'){
+        if($_FILES["file"]["error"] == 1){
             echo json_encode([
-                'result' => false,
+                'error' => true,
+                'msg' => $msg
+            ]);
+            die;
+        }
+        if( $_FILES["file"]["type"] != 'application/pdf' && pathinfo($_FILES["file"]["name"])['extension'] != 'pdf' ){
+            echo json_encode([
+                'error' => true,
                 'msg' => 'Veuillez choisir un fichier .pdf'
             ]);
             die;
         }
 
         $result = move_uploaded_file($_FILES["file"]["tmp_name"], $target_file);
-
-        $msg = 'Echec lors du chargement du fichier';
-        $file = [];
 
         if($result == 1){
             $msg = 'Fichier chargé avec succès !';
@@ -360,21 +367,25 @@ class AppController extends Controller {
 
             $file_name;
 
-            // debug('C:\Program Files\poppler-0.68.0\bin\pdftohtml -c -s "'.ROOT.$file_name.'.pdf" "'.ROOT.'\public\uploads\\'.$file_name.'\html\\'.$file_name.'.html"');
+            // debug('pdftohtml -c "'.ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$file_name.DIRECTORY_SEPARATOR.$file_name.'.pdf" "'.ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$file_name.DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$file_name.'.html"');
             $process =  proc_open(
-                'C:\Program Files\poppler-0.68.0\bin\pdftohtml -c "'.ROOT.'\public\uploads\\'.$file_name.'\\'.$file_name.'.pdf" "'.ROOT.'\public\uploads\\'.$file_name.'\html\\'.$file_name.'.html"',
+                // 'C:\Program Files\poppler-0.68.0\bin\pdftohtml -c "'.ROOT.'\public\uploads\\'.$file_name.'\\'.$file_name.'.pdf" "'.ROOT.'\public\uploads\\'.$file_name.'\html\\'.$file_name.'.html"', /* Version Windows */
+                'pdftohtml -c "'.ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$file_name.DIRECTORY_SEPARATOR.$file_name.'.pdf" "'.ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$file_name.DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$file_name.'.html"', /* Version Linux */
                 [],
                 $pipes,
                 null,
                 null,
                 ['bypass_shell' => true]
             );
-        }   
+            $error = false;
+        }else{
+            $error = true;
+        }
 
         $file_html = $target_dir . 'html/' . $file_name . '-1.html';
 
         echo json_encode([
-            'result' => $result,
+            'error' => $error,
             'msg' => $msg,
             'file' => $file,
             'file_html' => $file_html
@@ -534,6 +545,20 @@ class AppController extends Controller {
             // appel de l'api de traduction de google
             $english_value = str_replace(' ', '%20',trim($_POST['english_value']));
             $curl = curl_init();
+            // curl_setopt($curl,CURLOPT_SSL_VERIFYPEER, false);
+
+            // $options = array(
+            //     CURLOPT_RETURNTRANSFER => true,     // return web page
+            //     CURLOPT_HEADER         => false,    // don't return headers
+            //     CURLOPT_FOLLOWLOCATION => true,     // follow redirects
+            //     CURLOPT_ENCODING       => "",       // handle all encodings
+            //     CURLOPT_USERAGENT      => "spider", // who am i
+            //     CURLOPT_AUTOREFERER    => true,     // set referer on redirect
+            //     CURLOPT_CONNECTTIMEOUT => 120,      // timeout on connect
+            //     CURLOPT_TIMEOUT        => 120,      // timeout on response
+            //     CURLOPT_MAXREDIRS      => 10,       // stop after 10 redirects
+            //     CURLOPT_SSL_VERIFYPEER => false     // Disabled SSL Cert checks
+            // );
             curl_setopt($curl, CURLOPT_URL, 'https://translation.googleapis.com/language/translate/v2/?q='.$english_value.'&source=en&target=fr&key=AIzaSyDXclEOa7zqozby4oRS_Z1q7KIzsmclaTc');
             // curl_setopt($curl, CURLOPT_HTTPHEADER, array(
             //     'key: AIzaSyDXclEOa7zqozby4oRS_Z1q7KIzsmclaTc',
@@ -545,8 +570,11 @@ class AppController extends Controller {
             curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
             // EXECUTE:
             $result = curl_exec($curl);
-
-            if(!$result){die("Erreur de connexion au service de traduction");}
+            $err = curl_errno( $curl );
+            // var_dump($err);
+            // die();
+            if(!$result){
+                die("Erreur de connexion au service de traduction");}
             curl_close($curl);
 
             $array_result = json_decode($result, true);

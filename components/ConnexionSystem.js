@@ -107,7 +107,7 @@ export default class ConnexionSystem extends Component {
               })
               .then((response) => {
                 console.log(response);
-                if(response.statusText == 'OK'){
+
                   if(response.data.error == true){
                     this.viewMessageFlash(response.data.msg, true);
                   }else{
@@ -116,9 +116,6 @@ export default class ConnexionSystem extends Component {
                     this.viewMessageFlash(response.data.msg, false, false);
                     document.location.href="/app";
                   }
-                }else{
-                  this.viewMessageFlash('Erreur lors de la création de l\'utilisateur', true);
-                }
     
               })
               .catch( (error) => {
@@ -157,7 +154,6 @@ export default class ConnexionSystem extends Component {
             })
             .then((response) => {
               console.log(response);
-              if(response.statusText == 'OK'){
                 if(response.data.error == true){
                   this.viewMessageFlash(response.data.msg, true);
                 }else{
@@ -166,10 +162,6 @@ export default class ConnexionSystem extends Component {
                   this.viewMessageFlash(response.data.msg, false, false);
                   document.location.href="/app";
                 }
-              }else{
-                this.viewMessageFlash('Erreur lors de la tentative de connexion', true);
-              }
-  
             })
             .catch( (error) => {
               console.log(error);
@@ -227,7 +219,7 @@ export default class ConnexionSystem extends Component {
                             <h1>Connexion</h1>
                             <div className="form-group">
                                 <label htmlFor="siret-input">Email</label>
-                                <input type="email" value={this.state.siretLogin} onChange={() => {this.setState({email: document.querySelector("#email-input").value})}} className="form-control" id="email-input" placeholder="Entrez votre Email"/>
+                                <input type="email" value={this.state.siretLogin} onChange={() => { console.log(document.querySelector("#email-input").value); this.setState({email: document.querySelector("#email-input").value}) }} className="form-control" id="email-input" placeholder="Entrez votre Email"/>
                             </div>
                             <div className="form-group">
                                 <label htmlFor="exampleInputPassword1">Mot de passe</label>
@@ -239,6 +231,8 @@ export default class ConnexionSystem extends Component {
                             </div>
                         </form>
         }
+
+
         return (
                 <div style={{width: '80%'}}>
                     <div id="message-flash" style={styles.mfs}>

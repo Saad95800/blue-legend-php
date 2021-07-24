@@ -73,8 +73,10 @@ class UserManager extends Model {
         $user = $req->fetch(\PDO::FETCH_OBJ);
         if ($user) {
             return $user;
+        }else{
+            return [];
         }
-        return false;
+        
     }
 
     public function checkIfEmailExist($email){			

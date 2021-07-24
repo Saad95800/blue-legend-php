@@ -31,3 +31,20 @@ define('DB_HOST',$config->get('db_host'));
 define('DB_USER',$config->get('db_user'));
 define('DB_PASSWORD',$config->get('db_pswd'));
 define('DB_PORT',$config->get('db_port'));
+
+function debug($value, $die = true, $type = 1) {
+
+    if ($type == 1) {
+        echo '<pre>';
+        print_r($value);
+        echo '</pre>';
+    } else {
+        echo '<pre>';
+        var_dump($value);
+        echo '</pre>';
+    }
+
+    if ($die) {
+        die();
+    }
+}

@@ -87,12 +87,7 @@ console.log('update text')
           })
           .then((response) => {
               console.log(response)
-            if(response.statusText == 'OK'){
-            //   let text = this.state.texte;
-            //   text.content = wysiwyg.value;
-            //   this.setState({texte: text, wysiwyg: false});
             this.setState({redirect: true})
-            }
           })
           .catch( (error) => {
             console.log(error);
