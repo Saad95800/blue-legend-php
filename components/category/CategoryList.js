@@ -35,7 +35,7 @@ export default class CategoryList extends Component {
 
     let categories = this.state.categories.map((category, index) => {
       let categoryName = category.name_category.length > 20 ? category.name.substring(0, 20)+'...' : category.name_category;
-        return  <div className="col-xs-4 col-sm-2" key={index}>
+        return  <div key={index}>
                   <Link
                     to={'/categorie-edit/'+category.id_category}
                     className={this.props.classItem}
@@ -52,7 +52,7 @@ export default class CategoryList extends Component {
 
       return (
         <div className="container-list-category container-page display-flex-center">
-          <Container>
+          <div style={{width: '100%'}}>
           <div className="block-category-list">
             <Row>
               <div className="main-titles">
@@ -70,7 +70,7 @@ export default class CategoryList extends Component {
               {categories}
             </Row>
             </div>
-          </Container>
+          </div>
       </div>
       );
     }

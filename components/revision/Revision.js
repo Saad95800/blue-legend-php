@@ -189,7 +189,7 @@ export default class Revision extends Component {
     }
 
     return (
-      <div className="container container-page">
+      <div className="container-page container-revision">
         <Row>
           <div className="main-titles">
             REVISION

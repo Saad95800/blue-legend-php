@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Row, Col, Button } from 'reactstrap';
-import {capitalizeFirstLetter, limit20str, insertLog} from './../functions';
+import {capitalizeFirstLetter, limit15str, insertLog} from './../functions';
 import {root} from './../setup'
 
 export default class TextList extends Component {
@@ -66,18 +66,18 @@ export default class TextList extends Component {
 
         let textes = this.state.textes.map((texte, index) => {
           if(texte.fk_id_category == this.state.category_selected  || this.state.category_selected == ''){
-            let textTitle = limit20str(texte.title_text)
+            let textTitle = limit15str(texte.title_text)
             let folder = texte.file_name_server.replace('.pdf', '')
             let cssItem = {background: 'url('+root+'public/img/main_img.png) -2349px -200px no-repeat'}
             if(texte.type_text == 'pdf'){
               cssItem = {boxShadow: '0px 0px 10px 0px grey', background: 'url('+root+'/public/uploads/'+folder+'/html/'+folder+'001.png'+') no-repeat', backgroundSize: '100%'}
             }
-            return  <div className="col-xs-4 col-sm-2" key={index}>
+            return  <div className="col-6 col-sm-2 col-md-1" key={index}>
                       <Link
                         to={'/texte/'+texte.id_text}
                         key={index}>
                         <div key={index} className="list-hover-item">
-                          <div className="display-flex-center" style={{textAlign: 'center', padding: '12px 0px', height: '96px'}}>{ capitalizeFirstLetter(textTitle) }</div>
+                          <div className="display-flex-center title-text-item">{ capitalizeFirstLetter(textTitle) }</div>
                           <div style={{'textAlign': 'center'}}>
                           <span className="img-item-liste-texte" style={cssItem}></span>
                           </div>
@@ -94,7 +94,7 @@ export default class TextList extends Component {
         })
       return (
               <div className="container-text-list container-page display-flex-center">
-                <Container>
+                <div style={{width: '100%'}}>
                   <Row>
                     <div className="main-titles">
                       LISTE DES TEXTES
@@ -102,7 +102,8 @@ export default class TextList extends Component {
                   </Row>
                   <div className="row">
                   <div className="col-sm-6">
-                    <select className="form-control" id="select-category-text-list" style={{marginTop: '40px'}} value={this.state.category_selected} onChange={()=>{this.changeCategory()}}>
+                    <span>Catégories : </span>
+                    <select className="form-control" id="select-category-text-list" style={{marginTop: '20px'}} value={this.state.category_selected} onChange={()=>{this.changeCategory()}}>
                       <option value="">---</option>
                       {options}
                     </select>
@@ -116,7 +117,7 @@ export default class TextList extends Component {
                   <Row style={{marginTop: '20px'}}>
                     {textes}
                   </Row>
-                </Container>
+                </div>
               </div>
       );
     }

@@ -269,12 +269,12 @@ class AppController extends Controller {
 
         if($id_text){
 
-            $links = '
-                <link rel="stylesheet" href="'.URLROOT.'/public/css/file.css" rel="stylesheet" />
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
-                <script src="'.URLROOT.'/public/pages/web/jquery-2.2.2.min.js"></script>
-                <script src="'.URLROOT.'/public/js/file.js"></script>
-            ';
+            // $links = '
+            //     <link rel="stylesheet" href="'.URLROOT.'/public/css/file.css" rel="stylesheet" />
+            //     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+            //     <script src="'.URLROOT.'/public/pages/web/jquery-2.2.2.min.js"></script>
+            //     <script src="'.URLROOT.'/public/js/file.js"></script>
+            // ';
             // $add_html = '
             // <div id="id-text" style="display:none;"></div>
             // <div id="cal1">&nbsp;</div>
@@ -291,21 +291,21 @@ class AppController extends Controller {
             // </div>
             // ';
 // debug($_POST);
-            if($_POST['type_text'] == 'pdf'){
-                for($i = 1; $i <= $nbpage; $i++){
-                    $file_root = ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$_POST['id_file'].DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$_POST['id_file'].'-'.$i.'.html';
-                    $texte = file_get_contents($file_root);
-                    $texte = preg_replace('/\<\/head\>/', $links.'</head>', $texte, 1);
-                    // $texte = preg_replace('/\<\/body\>/', $add_html.'</body>', $texte, 1);
-                    file_put_contents($file_root, $texte);                
-                }                
-            }elseif($_POST['type_text'] == 'link'){
-                $file_root = ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'links'.DIRECTORY_SEPARATOR.$_POST['file_name_server_link'];
-                $texte = file_get_contents($file_root);
-                $texte = preg_replace('/\<\/head\>/', $links.'</head>', $texte, 1);
-                // $texte = preg_replace('/\<\/body\>/', $add_html.'</body>', $texte, 1);
-                file_put_contents($file_root, $texte);      
-            }
+            // if($_POST['type_text'] == 'pdf'){
+            //     for($i = 1; $i <= $nbpage; $i++){
+            //         $file_root = ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$_POST['id_file'].DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$_POST['id_file'].'-'.$i.'.html';
+            //         $texte = file_get_contents($file_root);
+            //         $texte = preg_replace('/\<\/head\>/', $links.'</head>', $texte, 1);
+            //         // $texte = preg_replace('/\<\/body\>/', $add_html.'</body>', $texte, 1);
+            //         file_put_contents($file_root, $texte);                
+            //     }                
+            // }elseif($_POST['type_text'] == 'link'){
+            //     $file_root = ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'links'.DIRECTORY_SEPARATOR.$_POST['file_name_server_link'];
+            //     $texte = file_get_contents($file_root);
+            //     $texte = preg_replace('/\<\/head\>/', $links.'</head>', $texte, 1);
+            //     // $texte = preg_replace('/\<\/body\>/', $add_html.'</body>', $texte, 1);
+            //     file_put_contents($file_root, $texte);      
+            // }
 
             // $em = new ExpressionManager();
             // $recordExpressions = $em->getRecordExpressions($_SESSION['id_user'], $id_text);

@@ -24,10 +24,11 @@ export default class Text extends Component {
       type_text: '',
       active_page: 1,
       heightContainerIframePdf: '500px',
-      zoom: 1,
+      zoom: (window.screen.width < 600 ? 0.4 : 1),
       fullSreenPdf: false,
       file_name_server: '',
-      file_name_server_link: ''
+      file_name_server_link: '',
+      heightIframePdf: ''
     }
 
       this.inputTitleText = document.querySelector("#title-text");
@@ -71,7 +72,10 @@ export default class Text extends Component {
     // console.log('componentDidMount')
     // console.log($("#container-iframe-pdf"))
     // console.log(($(window).height()-130)+'px')
-    this.setState({heightContainerIframePdf: ($(window).height()-120)+'px'})
+    this.setState({
+      heightContainerIframePdf: ($(window).height()-120)+'px',
+      heightIframePdf: '1291px'
+    })
     $('#iframe-pdf').css('height', ($(window).height()-380)+'px')
 
   }
@@ -88,53 +92,84 @@ export default class Text extends Component {
       }
     }  
 
-    document.querySelector("#container-iframe-pdf").scrollTo(0, 0)
+    window.scrollTo(0, 0)
 
   }
 
   zoonIn(){
-    this.setState({zoom: this.state.zoom + 0.1})
-    $($('#iframe-pdf').context).find('body').css({'transform': 'scale('+this.state.zoom+')'})
-    // $('#iframe-pdf').css('height', ( ($(window).height()-380)/(this.state.zoom + 0.06) )+'px')
-  }
+    
+    if(this.state.zoom < 2.1){
+      let height = ( parseInt($('#iframe-pdf').css('height').replace('px', '')) + 126 ) + 'px'
+      // let zoom = ( parseInt($(document.querySelector('#iframe-pdf').contentWindow.document.body).css('transform').replace('scale(', '').replace(')', '')) + 0.1 )
+      console.log(this.state.zoom )
+      $('#iframe-pdf').css('height', height)
+      $(document.querySelector('#iframe-pdf').contentWindow.document.body).css('transform', 'scale('+(this.state.zoom+0.1)+')')
+      this.setState({zoom: this.state.zoom + 0.1, heightIframePdf: height})      
+    }
 
+  }
+  
   zoonOut(){
-    this.setState({zoom: this.state.zoom - 0.1})
-    $($('#iframe-pdf').context).find('body').css({'transform': 'scale('+this.state.zoom+')'})
-    // $('#iframe-pdf').css('height', ( ($(window).height()-380)/(this.state.zoom - 0.06) )+'px')
+    
+    let zoom = 1
+    if(window.screen.width < 600) zoom = 0.4
+
+    if(this.state.zoom > zoom){
+      let height = ( parseInt($('#iframe-pdf').css('height').replace('px', '')) - 126 ) + 'px'
+      // let zoom = ( parseInt( $(document.querySelector('#iframe-pdf').contentWindow.document.body).css('transform').replace('scale(', '').replace(')', '')) - 0.1 )
+      console.log(this.state.zoom )
+      $('#iframe-pdf').css('height', height)
+      $(document.querySelector('#iframe-pdf').contentWindow.document.body).css('transform', 'scale('+(this.state.zoom-0.1)+')')
+      this.setState({zoom: this.state.zoom - 0.1, heightIframePdf: height})
+    }
   }
 
   fullScreenIframePdf(){
+
     if(this.state.fullSreenPdf){
       this.setState({fullSreenPdf: false})
       $("#iframe-pdf").css({
-        'position': 'relative',
-        'top': '-0px',
-        'left': '-0px',
-        'z-index': 1,
-        'overflow': 'scroll',
-        'height': '1720px',
-        'width': '100%'
+        'position': 'static',
+        'top': 'auto',
+        'left': 'auto',
+        'z-index': 'auto',
+        'width': '100%',
+        // 'height': this.state.heightIframePdf
+      })
+      $(".container-btn-page").css({
+        'left': '60px',
+        'top': '110px'
       })
       $("#full-screen-btn").css({
-        'top': '11px',
-        'right': '43px'
+        'position': 'absolute',
+        'top': '50px',
+        'right': '43px',
+        // 'z-index': '-1'
       })
+      $(document.querySelector('#iframe-pdf').contentWindow.document.body).css('transform-origin', 'center top')
     }else{
       this.setState({fullSreenPdf: true})
       $("#iframe-pdf").css({
         'position': 'absolute',
-        'top': '-156px',
-        'left': '-62px',
-        'z-index': 1,
-        'overflow': 'scroll',
-        'height': '100%',
-        'width': '100%'
+        'top': (window.screen.width < 600 ? '-130px': '-100px'),
+        'left': (window.screen.width < 600 ? '12px': '-37px'),
+        'z-index': '1',
+        'width': window.screen.width,
+        // 'height': window.screen.height
+      })
+      $(".container-btn-page").css({
+        'left': '28px',
+        'top': '10px'
       })
       $("#full-screen-btn").css({
-        'top': '-83px',
-        'right': '-68px'
+        'position': 'fixed',
+        'top': '15px',
+        'right': '15px',
+        // 'z-index': '2'
       })
+      if(window.screen.width < 600){
+        $(document.querySelector('#iframe-pdf').contentWindow.document.body).css('transform-origin', 'center 165px')
+      }
     }
 
   }
@@ -177,7 +212,7 @@ export default class Text extends Component {
         }
         let src = root+'public/uploads/'+fns+'/html/'+fns+'-'+this.state.active_page+'.html'+ancre;
         text = 
-        <div id="" style={{backgroundColor: '#939393', overflowX: 'clip'}}>
+        <div id="" style={{backgroundColor: '#939393', overflowX: 'clip', marginTop: '40px'}}>
           <div id="full-screen-btn" onClick={()=>{this.fullScreenIframePdf()}}
           ></div>
           <div className="container-btn-page">
@@ -194,9 +229,10 @@ export default class Text extends Component {
             data-id_ancre={this.state.texte.ancre_ligne}
             data-texte={JSON.stringify(this.state.texte)}
             data-root={root}
+            data-zoom={this.state.zoom}
             src={src}
             // style={{height: this.state.heightContainerIframePdf, zoom: '0.75', transform: 'scale('+this.state.zoom+')', transformOrigin: '0 0'}}
-            style={{transform: 'scale('+this.state.zoom+')', transformOrigin: 'center top', border: 'none'}}
+            style={{border: 'none', height: '1291px'}}
           ></iframe>
         </div>
       }else if(this.state.type_text == 'link'){

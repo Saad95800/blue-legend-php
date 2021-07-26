@@ -27,12 +27,12 @@ export default class TextListRevision extends Component {
         if(texte.type_text == 'pdf'){
           cssItem = {boxShadow: '0px 0px 10px 0px grey', background: 'url('+root+'/public/uploads/'+folder+'/html/'+folder+'001.png'+') no-repeat', backgroundSize: '100%'}
         }
-        return  <div className="col-xs-4 col-sm-2" key="index">
+        return  <div className="" key="index">
                   <Link
                     to={link}
                     key={index}>
                     <div key={texte.id_text} className="list-hover-item">
-                      <div className="display-flex-center" style={{textAlign: 'center', height: '40px'}}>{ capitalizeFirstLetter(textTitle) }</div>
+                      <div className="display-flex-center title-text-item">{ capitalizeFirstLetter(textTitle) }</div>
                       <div style={{'textAlign': 'center'}}>
                       <span className="img-item-liste-texte" style={cssItem}></span>
                       </div>

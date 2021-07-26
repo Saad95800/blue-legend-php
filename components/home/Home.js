@@ -53,7 +53,7 @@ export default class Home extends Component {
       return (
         <div className="container-home container-page display-flex-center">
 
-            <div>
+            <div style={{width: '100%'}}>
               <Container>
                 <Row>
                   <div className="main-titles">

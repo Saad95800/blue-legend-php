@@ -96,6 +96,76 @@ export default class NavBar extends Component {
         //     isSelected: false
         // }
       ],
+      itemsMobile:[
+        {
+          url:"/accueil",
+          classContainer:"bloc-btn-menu",
+          classItem:"menu-item nav-item-left",
+          id:"item-menu-accueil-mobile",
+          style: {width: '80px', height: '68px'},
+          isSelected: false,
+          title: 'Dashboard',
+          cssTitle: {position: 'absolute', marginTop: '32px', marginLeft: '-36px', color: 'white', fontSize: '9px'}
+        },
+        {
+            url:"/texte-liste",
+            classContainer:"bloc-btn-menu",
+            classItem:"menu-item nav-lecture",
+            id:"item-menu-text",
+            style: {},
+            isSelected: false,
+            title: 'Textes',
+            cssTitle: {position: 'absolute', marginTop: '58px', marginLeft: '-48px', color: 'white'}
+        },
+        {
+            url:"/categories-liste",
+            classContainer:"bloc-btn-menu",
+            classItem:"menu-item nav-categories",
+            id:"item-menu-categories",
+            style: {},
+            isSelected: false,
+            title: 'Catégories',
+            cssTitle: {position: 'absolute', marginTop: '58px', marginLeft: '-60px', color: 'white'}
+        },
+        {
+            url:"/revision",
+            classContainer:"bloc-btn-menu",
+            classItem:"menu-item nav-revision",
+            id:"item-menu-revision",
+            style: {},
+            isSelected: false,
+            title: 'Révision',
+            cssTitle: {position: 'absolute', marginTop: '58px', marginLeft: '-51px', color: 'white'}
+        },
+        {
+            url:"/expressions",
+            classContainer:"bloc-btn-menu",
+            classItem:"menu-item nav-expression",
+            id:"item-menu-expression",
+            style: {},
+            isSelected: false,
+            title: 'Expressions',
+            cssTitle: {position: 'absolute', marginTop: '58px', marginLeft: '-64px', color: 'white'}
+        },
+        // {
+        //     url:"/info-user",
+        //     classContainer:"bloc-btn-menu-left",
+        //     classItem:"menu-item-left nav-item-left",
+        //     id:"item-menu-info-user",
+        //     style: {},
+        //     isSelected: false,
+        //     title: 'Infos Utilisateur',
+        // },
+        // {
+        //     url:"/parametres",
+        //     classContainer:"bloc-btn-menu-left",
+        //     classItem:"menu-item-left nav-item-left",
+        //     id:"item-menu-parametres",
+        //     style: {},
+        //     isSelected: false,
+        //     title: 'Paramètres',
+        // }
+      ],
       itemsLeft:[
         {
             url:"/accueil",
@@ -107,24 +177,24 @@ export default class NavBar extends Component {
             title: 'Dashboard',
             cssTitle: {position: 'absolute', marginTop: '32px', marginLeft: '-36px', color: 'white', fontSize: '9px'}
         },
-        {
-            url:"/info-user",
-            classContainer:"bloc-btn-menu-left",
-            classItem:"menu-item-left nav-item-left",
-            id:"item-menu-info-user",
-            style: {},
-            isSelected: false,
-            title: 'Infos Utilisateur',
-        },
-        {
-            url:"/parametres",
-            classContainer:"bloc-btn-menu-left",
-            classItem:"menu-item-left nav-item-left",
-            id:"item-menu-parametres",
-            style: {},
-            isSelected: false,
-            title: 'Paramètres',
-        }
+        // {
+        //     url:"/info-user",
+        //     classContainer:"bloc-btn-menu-left",
+        //     classItem:"menu-item-left nav-item-left",
+        //     id:"item-menu-info-user",
+        //     style: {},
+        //     isSelected: false,
+        //     title: 'Infos Utilisateur',
+        // },
+        // {
+        //     url:"/parametres",
+        //     classContainer:"bloc-btn-menu-left",
+        //     classItem:"menu-item-left nav-item-left",
+        //     id:"item-menu-parametres",
+        //     style: {},
+        //     isSelected: false,
+        //     title: 'Paramètres',
+        // }
       ],
       url_courante: this.props.data.url,
       menuMobileView: false
@@ -206,6 +276,37 @@ export default class NavBar extends Component {
                             key={item.id}
                           />
     });
+    let navitemsMobile = this.state.itemsMobile.map((item) =>{
+      return             <NavItem
+                            url={item.url}
+                            url_courante={this.state.url_courante}
+                            classContainer={item.classContainer}
+                            classItem={item.classItem}
+                            id={item.id}
+                            style={item.style}
+                            isSelected={item.isSelected}
+                            title={item.title}
+                            cssTitle={item.cssTitle}
+                            colorHoverItem={this.colorHoverItem.bind(this)} 
+                            colorMouseOutItem={this.colorMouseOutItem.bind(this)} 
+                            colorClickItem={this.colorClickItem.bind(this)}
+                            position="top"
+                            key={item.id}
+                          />
+    });
+    navitemsMobile.push(
+      <NavItem
+        url={'/logout'}
+        url_courante={this.state.url_courante}
+        classContainer={'bloc-btn-menu-right'}
+        classItem={'menu-item nav-vitrine'}
+        id={'item-logout'}
+        style={{position: 'absolute', bottom: '55px'}}
+        isSelected={false}
+        colorClickItem={this.colorClickItem.bind(this)}
+        colorHoverItem={() => {}}
+      />
+    )
     let navitemsLeft = this.state.itemsLeft.map((item) =>{
       return             <NavItem
                             url={item.url}
@@ -225,15 +326,21 @@ export default class NavBar extends Component {
                           />
     });
 
-    let displayMenuMobile = {left: '-160px'};
+    let displayMenuMobile = {left: '-80px'};
     if(this.state.menuMobileView == true){
       displayMenuMobile = {left: '0px'};
     }
     return (
       <div>
-        <nav className="menu-mobile" style={displayMenuMobile}></nav>
+        <nav className="menu-mobile" style={displayMenuMobile}>
+          {navitemsMobile}
+        </nav>
         <nav className="navbar-home-mobile">
-          <div className="bloc-btn-menu-mobile ml10" onClick={this.displayMenuMobile.bind(this)}><div className="menu-item nav-accueil" id="item-menu-home-mobile"></div></div>
+          <div className="bloc-btn-menu-mobile ml10" onClick={this.displayMenuMobile.bind(this)}>
+            <div className="menu-item nav-accueil" id="item-menu-home-mobile">
+
+            </div>
+          </div>
         </nav>
         <nav className="navbar-home">
             <NavItem

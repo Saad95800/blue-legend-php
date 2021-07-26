@@ -5,10 +5,14 @@ document.addEventListener("DOMContentLoaded", function(){
     $('head').append('<link rel="stylesheet" href="'+$(window.parent.document).find('#iframe-pdf').data('root')+'public/css/file.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script><script src="'+$(window.parent.document).find('#iframe-pdf').data('root')+'public/pages/web/jquery-2.2.2.min.js"></script><script src="'+$(window.parent.document).find('#iframe-pdf').data('root')+'public/js/file.js"></script>')
     $('body').append('<div id="id-text" style="display:none;"></div><div id="cal1">&nbsp;</div><div id="cal2">&nbsp;</div><div id="popupTrad" class="popup-trad"><div class="arrow-popuptrad"></div><div id="translationPopupText" class="text-center"><div style="margin: 10px;font-weight:normal;display:none;" id="selText"></div><textarea style="margin: 10px;font-size: 1.5em;font-weight: bold;width: 95%;border: none;overflow: hidden;font-family: cursive;" id="frenchValue"></textarea></div><div class="display-flex-center" id="container-btn-save-expression"><div id="btnSaveExpression" class="display-flex-center" style="background-color: #6592ff"></div></div>')
     $('body').addClass('display-flex-center')
+    $('body').addClass('body-iframe-pdf')
     $('body').attr('id', 'body-iframe')
-    $('body').css({'background-color': '#939393'})
-    
-    
+    $('body').css({
+        'background-color': '#939393',
+        'transform': 'scale('+$(window.parent.document).find('#iframe-pdf').data('zoom')+')',
+        'transform-origin': 'center top',
+        'overflow-x': 'hidden'
+    })
 
     let frenchValue = ''
 
