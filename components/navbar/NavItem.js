@@ -31,17 +31,17 @@ export default class NavItem extends Component {
     }
   }
 
-  colorHoverItem(event){
-      this.props.colorHoverItem(event);
-  }
+  // colorHoverItem(event){
+  //     this.props.colorHoverItem(event);
+  // }
 
-  colorMouseOutItem(event){
-      this.props.colorMouseOutItem(event);
-  }
+  // colorMouseOutItem(event){
+  //     this.props.colorMouseOutItem(event);
+  // }
 
   render() {
-    let color = 'rgb(117, 222, 235, 0)';
-    if(this.props.url_courante == this.props.url || this.props.isSelected){
+    let color = 'transparent';
+    if(this.props.active){
       color = 'rgb(32, 96, 250)';
     }
     let style = this.props.style;
@@ -51,8 +51,8 @@ export default class NavItem extends Component {
             <Link
                 to={this.props.url}
                 className={this.props.classItem} 
-                onMouseOver={this.colorHoverItem.bind(this)} 
-                onMouseOut={this.colorMouseOutItem.bind(this)} 
+                // onMouseOver={this.colorHoverItem.bind(this)} 
+                // onMouseOut={this.colorMouseOutItem.bind(this)} 
                 onClick={this.colorClickItem.bind(this)} 
                 id={this.props.id}>
             </Link>

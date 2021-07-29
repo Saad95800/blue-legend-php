@@ -269,12 +269,12 @@ class AppController extends Controller {
 
         if($id_text){
 
-            // $links = '
-            //     <link rel="stylesheet" href="'.URLROOT.'/public/css/file.css" rel="stylesheet" />
-            //     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
-            //     <script src="'.URLROOT.'/public/pages/web/jquery-2.2.2.min.js"></script>
-            //     <script src="'.URLROOT.'/public/js/file.js"></script>
-            // ';
+            $links = '
+                <link rel="stylesheet" href="'.URLROOT.'/public/css/file.css" rel="stylesheet" />
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+                <script src="'.URLROOT.'/public/pages/web/jquery-2.2.2.min.js"></script>
+                <script src="'.URLROOT.'/public/js/file.js"></script>
+            ';
             // $add_html = '
             // <div id="id-text" style="display:none;"></div>
             // <div id="cal1">&nbsp;</div>
@@ -291,21 +291,21 @@ class AppController extends Controller {
             // </div>
             // ';
 // debug($_POST);
-            // if($_POST['type_text'] == 'pdf'){
-            //     for($i = 1; $i <= $nbpage; $i++){
-            //         $file_root = ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$_POST['id_file'].DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$_POST['id_file'].'-'.$i.'.html';
-            //         $texte = file_get_contents($file_root);
-            //         $texte = preg_replace('/\<\/head\>/', $links.'</head>', $texte, 1);
-            //         // $texte = preg_replace('/\<\/body\>/', $add_html.'</body>', $texte, 1);
-            //         file_put_contents($file_root, $texte);                
-            //     }                
-            // }elseif($_POST['type_text'] == 'link'){
-            //     $file_root = ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'links'.DIRECTORY_SEPARATOR.$_POST['file_name_server_link'];
-            //     $texte = file_get_contents($file_root);
-            //     $texte = preg_replace('/\<\/head\>/', $links.'</head>', $texte, 1);
-            //     // $texte = preg_replace('/\<\/body\>/', $add_html.'</body>', $texte, 1);
-            //     file_put_contents($file_root, $texte);      
-            // }
+            if($_POST['type_text'] == 'pdf'){
+                for($i = 1; $i <= $nbpage; $i++){
+                    $file_root = ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$_POST['id_file'].DIRECTORY_SEPARATOR.'html'.DIRECTORY_SEPARATOR.$_POST['id_file'].'-'.$i.'.html';
+                    $texte = file_get_contents($file_root);
+                    $texte = preg_replace('/\<\/head\>/', $links.'</head>', $texte, 1);
+                    // $texte = preg_replace('/\<\/body\>/', $add_html.'</body>', $texte, 1);
+                    file_put_contents($file_root, $texte);                
+                }                
+            }elseif($_POST['type_text'] == 'link'){
+                $file_root = ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'links'.DIRECTORY_SEPARATOR.$_POST['file_name_server_link'];
+                $texte = file_get_contents($file_root);
+                $texte = preg_replace('/\<\/head\>/', $links.'</head>', $texte, 1);
+                // $texte = preg_replace('/\<\/body\>/', $add_html.'</body>', $texte, 1);
+                file_put_contents($file_root, $texte);      
+            }
 
             // $em = new ExpressionManager();
             // $recordExpressions = $em->getRecordExpressions($_SESSION['id_user'], $id_text);
@@ -377,6 +377,7 @@ class AppController extends Controller {
                 null,
                 ['bypass_shell' => true]
             );
+            // var_dump(proc_get_status($process));die('toto');
             $error = false;
         }else{
             $error = true;
@@ -544,42 +545,40 @@ class AppController extends Controller {
         }else{
             // appel de l'api de traduction de google
             $english_value = str_replace(' ', '%20',trim($_POST['english_value']));
+            
             $curl = curl_init();
-            // curl_setopt($curl,CURLOPT_SSL_VERIFYPEER, false);
-
-            // $options = array(
-            //     CURLOPT_RETURNTRANSFER => true,     // return web page
-            //     CURLOPT_HEADER         => false,    // don't return headers
-            //     CURLOPT_FOLLOWLOCATION => true,     // follow redirects
-            //     CURLOPT_ENCODING       => "",       // handle all encodings
-            //     CURLOPT_USERAGENT      => "spider", // who am i
-            //     CURLOPT_AUTOREFERER    => true,     // set referer on redirect
-            //     CURLOPT_CONNECTTIMEOUT => 120,      // timeout on connect
-            //     CURLOPT_TIMEOUT        => 120,      // timeout on response
-            //     CURLOPT_MAXREDIRS      => 10,       // stop after 10 redirects
-            //     CURLOPT_SSL_VERIFYPEER => false     // Disabled SSL Cert checks
-            // );
-            curl_setopt($curl, CURLOPT_URL, 'https://translation.googleapis.com/language/translate/v2/?q='.$english_value.'&source=en&target=fr&key=AIzaSyDXclEOa7zqozby4oRS_Z1q7KIzsmclaTc');
-            // curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-            //     'key: AIzaSyDXclEOa7zqozby4oRS_Z1q7KIzsmclaTc',
-            //     'source: en',
-            //     'target: fr',
-            //     'Content-Type: application/json',
-            //  ));
+            curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+            curl_setopt($curl, CURLOPT_CAINFO, '/path/to/cacert.pem');
+            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+            $options = array(
+                CURLOPT_RETURNTRANSFER => true,     // return web page
+                CURLOPT_HEADER         => false,    // don't return headers
+                CURLOPT_FOLLOWLOCATION => true,     // follow redirects
+                CURLOPT_ENCODING       => "",       // handle all encodings
+                CURLOPT_USERAGENT      => "spider", // who am i
+                CURLOPT_AUTOREFERER    => true,     // set referer on redirect
+                CURLOPT_CONNECTTIMEOUT => 120,      // timeout on connect
+                CURLOPT_TIMEOUT        => 120,      // timeout on response
+                CURLOPT_MAXREDIRS      => 10,       // stop after 10 redirects
+                CURLOPT_SSL_VERIFYPEER => false     // Disabled SSL Cert checks
+            );
+            curl_setopt_array( $curl, $options );
+            curl_setopt($curl, CURLOPT_URL, "https://translation.googleapis.com/language/translate/v2/?q=$english_value&source=en&target=fr&key=AIzaSyDXclEOa7zqozby4oRS_Z1q7KIzsmclaTc");
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            // EXECUTE:
             $result = curl_exec($curl);
             $err = curl_errno( $curl );
-            // var_dump($err);
-            // die();
+
             if(!$result){
-                die("Erreur de connexion au service de traduction");}
+                die("Erreur de connexion au service de traduction");
+            }
             curl_close($curl);
 
             $array_result = json_decode($result, true);
-            $french_val = $array_result['data']['translations'][0]['translatedText'];
-// debug($french_val);
+
+            $french_val = str_replace( '&#39;', "'", $array_result['data']['translations'][0]['translatedText']);
+            // $french_val = str_replace( '&#39;', "'", json_decode($contents, true)['data']['translations'][0]['translatedText']);
+
             $result = $em->saveExpression($french_val, $_POST['english_value']);
              if($result){
                 // Insérer la nouvelle expression en base de donnée
@@ -587,7 +586,7 @@ class AppController extends Controller {
                     'existDb' => 'no', 
                     'existUserSpace' => 'no', 
                     'translation' => $french_val
-                ]);                 
+                ]);
              }else{
                 echo json_encode([
                     'error' => true, 

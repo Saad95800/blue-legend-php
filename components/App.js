@@ -40,7 +40,9 @@ export default class Appclient extends Component {
   constructor(props){
     super(props);
     this.state = {
-      data: this.props.data
+      data: this.props.data,
+      navItemActive: 'accueil',
+      menuMobileView: false
     }
   }
 
@@ -61,6 +63,14 @@ export default class Appclient extends Component {
 
   }
 
+  setColorNavItem(navItem){
+    this.setState({navItemActive: navItem, menuMobileView: false})
+  }
+
+  displayMenuMobile(menuMobileView){
+    this.setState({menuMobileView: menuMobileView})
+  }
+
   render() {
 
     let data = this.props.data;
@@ -79,27 +89,28 @@ export default class Appclient extends Component {
                     atActive={{ opacity: 1 }}
                     className="switch-wrapper">
                           <Route 
-                            path="/app" 
-                            render={(props) => { return <Home {...props} 
+                            path="/app"
+                            render={(props) => { return <Home {...props} setColorNavItem={this.setColorNavItem.bind(this)} 
                             data={data} 
                             />}} 
                           />
                           <Route 
-                            path="/accueil" 
+                            path="/accueil"
                             render={(props) => { return <Home {...props} 
-                            data={data} 
-                            />}} 
+                                                          setColorNavItem={this.setColorNavItem.bind(this)} 
+                                                          data={data} 
+                                                        />}}
                           />
                           <Route 
                             path="/ajout-texte" 
-                            render={(props) => { return <TextAdd {...props} 
+                            render={(props) => { return <TextAdd {...props}
                             data={data} 
                             viewMessageFlash={this.viewMessageFlash.bind(this)} 
                             />}} 
                           />
                           <Route 
-                            path="/texte-liste" 
-                            render={(props) => { return <TextList {...props} 
+                            path="/texte-liste"
+                            render={(props) => { return <TextList {...props} setColorNavItem={this.setColorNavItem.bind(this)} 
                             data={data} 
                             />}} 
                           />
@@ -110,8 +121,8 @@ export default class Appclient extends Component {
                             />}} 
                           />
                           <Route 
-                            path="/categories-liste" 
-                            render={(props) => { return <CategoryList {...props} 
+                            path="/categories-liste"
+                            render={(props) => { return <CategoryList {...props} setColorNavItem={this.setColorNavItem.bind(this)} 
                             data={data} 
                             />}} 
                           />
@@ -138,7 +149,8 @@ export default class Appclient extends Component {
                           />    
                           {/* <SwipeableRoutes> */}
                             <Route 
-                              path="/revision" render={(props) => { return <Revision {...props}
+                              path="/revision"
+                              render={(props) => { return <Revision {...props} setColorNavItem={this.setColorNavItem.bind(this)} 
                               data={data}
                               step={'text-list'}
                                />}} 
@@ -191,8 +203,8 @@ export default class Appclient extends Component {
                                />} } 
                             />
                             <Route 
-                              path="/expressions" 
-                              render={ (props) => { return <ExpressionList viewMessageFlash={this.viewMessageFlash.bind(this)} {...props} 
+                              path="/expressions"
+                              render={ (props) => { return <ExpressionList viewMessageFlash={this.viewMessageFlash.bind(this)} {...props} setColorNavItem={this.setColorNavItem.bind(this)} 
                               data={data} 
                                />} } 
                             />
@@ -212,7 +224,7 @@ export default class Appclient extends Component {
                   </AnimatedSwitch>
                   </div>
                 <Route 
-                  render={ (props) => { return <NavBar {...props} data={{url: this.props.data.url}}/>} }
+                  render={ (props) => { return <NavBar {...props} displayMenuMobile={this.displayMenuMobile.bind(this)} menuMobileView={this.state.menuMobileView} navItemActive={this.state.navItemActive} data={{url: this.props.data.url}}/>} }
                 />
             </div>
       </BrowserRouter>

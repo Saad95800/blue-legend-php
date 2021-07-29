@@ -17,6 +17,7 @@ export default class CategoryList extends Component {
     }
     
     insertLog(axios, 6, 1)
+    this.props.setColorNavItem('categories-liste')
 
   }
 

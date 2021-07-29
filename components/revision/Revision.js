@@ -42,7 +42,11 @@ export default class Revision extends Component {
       }
     }
 
-    insertLog(axios, 12, 1)
+    if(this.props.location.pathname == '/revision'){
+      insertLog(axios, 12, 1)
+      this.props.setColorNavItem('revision')      
+    }
+
     
   }
 

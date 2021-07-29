@@ -21,6 +21,7 @@ export default class TextList extends Component {
     }
 
     insertLog(axios, 4, 1)
+    this.props.setColorNavItem('texte-liste')
     
   }
 
@@ -72,7 +73,7 @@ export default class TextList extends Component {
             if(texte.type_text == 'pdf'){
               cssItem = {boxShadow: '0px 0px 10px 0px grey', background: 'url('+root+'/public/uploads/'+folder+'/html/'+folder+'001.png'+') no-repeat', backgroundSize: '100%'}
             }
-            return  <div className="col-6 col-sm-2 col-md-1" key={index}>
+            return  <div className="col-6 col-sm-2" key={index}>
                       <Link
                         to={'/texte/'+texte.id_text}
                         key={index}>

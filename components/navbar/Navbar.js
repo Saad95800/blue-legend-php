@@ -9,7 +9,6 @@ export default class NavBar extends Component {
 
     super(props);
     let username = '';
-
     this.state = {
       username: username,
       items:[
@@ -27,6 +26,7 @@ export default class NavBar extends Component {
             classItem:"menu-item nav-lecture",
             id:"item-menu-text",
             style: {},
+            name_item: 'texte-liste',
             isSelected: false,
             title: 'Textes',
             cssTitle: {position: 'absolute', marginTop: '58px', marginLeft: '-48px', color: 'white'}
@@ -45,6 +45,7 @@ export default class NavBar extends Component {
             classItem:"menu-item nav-categories",
             id:"item-menu-categories",
             style: {},
+            name_item: 'categories-liste',
             isSelected: false,
             title: 'Catégories',
             cssTitle: {position: 'absolute', marginTop: '58px', marginLeft: '-60px', color: 'white'}
@@ -55,6 +56,7 @@ export default class NavBar extends Component {
             classItem:"menu-item nav-revision",
             id:"item-menu-revision",
             style: {},
+            name_item: 'revision',
             isSelected: false,
             title: 'Révision',
             cssTitle: {position: 'absolute', marginTop: '58px', marginLeft: '-51px', color: 'white'}
@@ -65,6 +67,7 @@ export default class NavBar extends Component {
             classItem:"menu-item nav-expression",
             id:"item-menu-expression",
             style: {},
+            name_item: 'expressions',
             isSelected: false,
             title: 'Expressions',
             cssTitle: {position: 'absolute', marginTop: '58px', marginLeft: '-64px', color: 'white'}
@@ -103,6 +106,7 @@ export default class NavBar extends Component {
           classItem:"menu-item nav-item-left",
           id:"item-menu-accueil-mobile",
           style: {width: '80px', height: '68px'},
+          name_item: 'accueil',
           isSelected: false,
           title: 'Dashboard',
           cssTitle: {position: 'absolute', marginTop: '32px', marginLeft: '-36px', color: 'white', fontSize: '9px'}
@@ -113,6 +117,7 @@ export default class NavBar extends Component {
             classItem:"menu-item nav-lecture",
             id:"item-menu-text",
             style: {},
+            name_item: 'texte-liste',
             isSelected: false,
             title: 'Textes',
             cssTitle: {position: 'absolute', marginTop: '58px', marginLeft: '-48px', color: 'white'}
@@ -123,6 +128,7 @@ export default class NavBar extends Component {
             classItem:"menu-item nav-categories",
             id:"item-menu-categories",
             style: {},
+            name_item: 'categories-liste',
             isSelected: false,
             title: 'Catégories',
             cssTitle: {position: 'absolute', marginTop: '58px', marginLeft: '-60px', color: 'white'}
@@ -133,6 +139,7 @@ export default class NavBar extends Component {
             classItem:"menu-item nav-revision",
             id:"item-menu-revision",
             style: {},
+            name_item: 'revision',
             isSelected: false,
             title: 'Révision',
             cssTitle: {position: 'absolute', marginTop: '58px', marginLeft: '-51px', color: 'white'}
@@ -143,6 +150,7 @@ export default class NavBar extends Component {
             classItem:"menu-item nav-expression",
             id:"item-menu-expression",
             style: {},
+            name_item: 'expressions',
             isSelected: false,
             title: 'Expressions',
             cssTitle: {position: 'absolute', marginTop: '58px', marginLeft: '-64px', color: 'white'}
@@ -173,6 +181,7 @@ export default class NavBar extends Component {
             classItem:"menu-item-left nav-item-left",
             id:"item-menu-accueil",
             style: {},
+            name_item: 'accueil',
             isSelected: false,
             title: 'Dashboard',
             cssTitle: {position: 'absolute', marginTop: '32px', marginLeft: '-36px', color: 'white', fontSize: '9px'}
@@ -197,7 +206,7 @@ export default class NavBar extends Component {
         // }
       ],
       url_courante: this.props.data.url,
-      menuMobileView: false
+      menuMobileView: this.props.menuMobileView
     }
     
   }
@@ -248,12 +257,14 @@ export default class NavBar extends Component {
   }
 
   displayMenuMobile(event){
-    console.log(this.state.menuMobileView);
-    if(this.state.menuMobileView == true){
-      this.setState({menuMobileView: false});
+    
+    let menuMobileView = false
+    if(this.props.menuMobileView == true){
+      menuMobileView = false
     }else{
-      this.setState({menuMobileView: true});
+      menuMobileView = true
     }
+    this.props.displayMenuMobile(menuMobileView)
   }
 
   render() {
@@ -266,11 +277,13 @@ export default class NavBar extends Component {
                             classItem={item.classItem}
                             id={item.id}
                             style={item.style}
+                            active={this.props.navItemActive == item.name_item}
+                            name_item={item.name_item}
                             isSelected={item.isSelected}
                             title={item.title}
                             cssTitle={item.cssTitle}
-                            colorHoverItem={this.colorHoverItem.bind(this)} 
-                            colorMouseOutItem={this.colorMouseOutItem.bind(this)} 
+                            // colorHoverItem={this.colorHoverItem.bind(this)} 
+                            // colorMouseOutItem={this.colorMouseOutItem.bind(this)} 
                             colorClickItem={this.colorClickItem.bind(this)}
                             position="top"
                             key={item.id}
@@ -284,6 +297,8 @@ export default class NavBar extends Component {
                             classItem={item.classItem}
                             id={item.id}
                             style={item.style}
+                            active={this.props.navItemActive == item.name_item}
+                            name_item={item.name_item}
                             isSelected={item.isSelected}
                             title={item.title}
                             cssTitle={item.cssTitle}
@@ -315,6 +330,8 @@ export default class NavBar extends Component {
                             classItem={item.classItem}
                             id={item.id}
                             style={item.style}
+                            active={this.props.navItemActive == item.name_item}
+                            name_item={item.name_item}
                             isSelected={item.isSelected}
                             title={item.title}
                             cssTitle={item.cssTitle}
@@ -326,8 +343,20 @@ export default class NavBar extends Component {
                           />
     });
 
+    navitemsLeft.push(<NavItem
+                            url={'/logout'}
+                            url_courante={this.state.url_courante}
+                            classContainer={'bloc-btn-menu-right'}
+                            classItem={'menu-item nav-vitrine'}
+                            id={'item-logout-mini'}
+                            style={{position: 'absolute', bottom: '65px', left:'-10px'}}
+                            isSelected={false}
+                            colorClickItem={this.colorClickItem.bind(this)}
+                            colorHoverItem={() => {}}
+                          />)
+
     let displayMenuMobile = {left: '-80px'};
-    if(this.state.menuMobileView == true){
+    if(this.props.menuMobileView == true){
       displayMenuMobile = {left: '0px'};
     }
     return (
@@ -337,8 +366,24 @@ export default class NavBar extends Component {
         </nav>
         <nav className="navbar-home-mobile">
           <div className="bloc-btn-menu-mobile ml10" onClick={this.displayMenuMobile.bind(this)}>
-            <div className="menu-item nav-accueil" id="item-menu-home-mobile">
-
+            <div className="display-flex-center menu-item nav-accueil" id="item-menu-home-mobile">
+              <div className="container-logo-mobile">
+                <NavItem
+                              url={'/'}
+                              url_courante={this.state.url_courante}
+                              classContainer={'bloc-btn-menu-vitrine'}
+                              classItem={'menu-item-vitrine nav-vitrine'}
+                              id={'item-vitrine'}
+                              style={''}
+                              isSelected={false}
+                              colorClickItem={this.colorClickItem.bind(this)}
+                              colorHoverItem={() => {}}
+                            />
+              </div>
+              <div className="display-flex-center" style={{color: '#fff', minWidth: '85px', textAlign: 'center', position: 'absolute', right: '0px'}} id="username-mobile">
+                <div className="navbar-img-user"></div>
+                <div style={{marginLeft: '8px', fontFamily: 'cursive'}}>{capitalizeFirstLetter(this.state.username)}</div>
+              </div>
             </div>
           </div>
         </nav>
@@ -355,17 +400,6 @@ export default class NavBar extends Component {
                             colorHoverItem={() => {}}
                           />
             {navitems}
-            <NavItem
-                            url={'/logout'}
-                            url_courante={this.state.url_courante}
-                            classContainer={'bloc-btn-menu-right'}
-                            classItem={'menu-item nav-vitrine'}
-                            id={'item-logout'}
-                            style={''}
-                            isSelected={false}
-                            colorClickItem={this.colorClickItem.bind(this)}
-                            colorHoverItem={() => {}}
-                          />
             <div className="display-flex-center" style={{justifyContent: 'left', color: '#fff', minWidth: '150px', height: '74px', padding: '7px 10px', textAlign: 'center', float: 'right'}} id="username">
               <div className="navbar-img-user"></div>
               <div style={{marginLeft: '8px', fontFamily: 'cursive'}}>{capitalizeFirstLetter(this.state.username)}</div>

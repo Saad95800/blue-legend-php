@@ -150,12 +150,13 @@ class Model {
     
     public function insertLog($page_log, $id_type_log, $comment = ''){
 
-        $sql = "INSERT INTO `bl_log_user`(`page_log`, `date`, `fk_id_type_log`, `comment`, `fk_id_user`) VALUES (:page_log, :date, :fk_id_type_log, :comment, :fk_id_user)";
+        $sql = "INSERT INTO `bl_log_user`(`page_log`, `date`, `fk_id_type_log`, `comment`, `ip_address`, `fk_id_user`) VALUES (:page_log, :date, :fk_id_type_log, :comment, :ip_address, :fk_id_user)";
         $req = $this->dbh->prepare($sql);
         $req->bindValue(':page_log', $page_log);
         $req->bindValue(':date', time());
         $req->bindValue(':fk_id_type_log', $id_type_log);
         $req->bindValue(':comment', $comment);
+        $req->bindValue(':ip_address', $_SERVER['REMOTE_ADDR']);
         $req->bindValue(':fk_id_user', null);
         $result = $req->execute();
 

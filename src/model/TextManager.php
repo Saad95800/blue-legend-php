@@ -16,7 +16,7 @@ class TextManager extends Model {
                 $sql2 = " AND fk_id_category = :id_category";
             }
 
-            $sql = "SELECT * FROM bl_text WHERE fk_id_user = :id_user ".$sql2;
+            $sql = "SELECT * FROM bl_text WHERE fk_id_user = :id_user ".$sql2." OR ISNULL(fk_id_user)";
 
             $req = $this->dbh->prepare($sql);
             $req->bindValue(':id_user', $id_user);
@@ -48,13 +48,13 @@ class TextManager extends Model {
 
             $this->dbh->beginTransaction();
 
-            $sql = "SELECT * FROM bl_text WHERE id_text = :id_text AND fk_id_user = :id_user";
+            $sql = "SELECT * FROM bl_text WHERE id_text = :id_text";
 
             $req = $this->dbh->prepare($sql);
             $req->bindValue(':id_text', $id_text);
-            $req->bindValue(':id_user', $id_user);
             $req->execute();
             $result = $req->fetch(\PDO::FETCH_ASSOC);
+
             if ($result) {
                 $texte = $result;
             }else{
@@ -214,7 +214,7 @@ class TextManager extends Model {
             $req->bindValue(':slug', $data['slug']);
             $req->bindValue(':nb_page', $data['nb_page']);
             $req->bindValue(':fk_id_user', $data['id_user']);
-            $req->bindValue(':fk_id_category', $data['id_category']);
+            $req->bindValue(':fk_id_category', (isset($data['id_category']) || $data['id_categoryy'] == '' ? null : $data['id_category']));
             $req->bindValue(':created_at', time());
             $req->bindValue(':updated_at', time());
             $result = $req->execute();

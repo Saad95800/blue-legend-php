@@ -24,6 +24,7 @@ export default class ExpressionList extends Component {
     }
 
     insertLog(axios, 7, 1)
+    this.props.setColorNavItem('expressions')
   }
 
   componentDidMount(){
@@ -247,7 +248,7 @@ export default class ExpressionList extends Component {
       <div className="block-Expression-list">
         {this.state.textes.map( (text, index) => {
 
-          let cssItem = {width: '52px', height: '60px', margin: 'auto', background: 'url('+root+'public/img/main_img.png) -681px 0px   no-repeat'}
+          let cssItem = {width: '30px', height: '30px', margin: 'auto', background: 'url('+root+'public/img/main_img.png) -15px -81px   no-repeat'}
           let bgc = 'transarent'
           if(text.id_text == this.state.id_text_selected){
             bgc = '#dde6ff'
@@ -279,7 +280,7 @@ export default class ExpressionList extends Component {
       <div className="block-Expression-list">
         {s.map( (serie, index) => {
 
-          let cssItem = {width: '52px', height: '60px', margin: 'auto', background: 'url('+root+'public/img/main_img.png) -784px 0px   no-repeat'}
+          let cssItem = {width: '30px', height: '30px', margin: 'auto', background: 'url('+root+'public/img/main_img.png) -45px -81px    no-repeat'}
           let bgc = 'transarent'
           if(serie.id_serie == this.state.id_serie_selected){
             bgc = '#dde6ff'
@@ -330,10 +331,10 @@ export default class ExpressionList extends Component {
       record_expressions =
       <div>
         <div>
-          <input type="text" placeholder="Rechercher" style={{marginTop: '5px'}} id="input-filter-record-expressions" value={this.state.inputFilterRecordExpressions} onChange={()=>{this.setState({inputFilterRecordExpressions: $('#input-filter-record-expressions').val()})}}/>
-          <button className="btn-danger" style={{float: 'right', marginTop: '5px'}} onClick={()=>{this.deleteRecordExpressionsChecked()}}>Supprimer les éléments sélectionnés</button>
+          <button className="btn-danger btn-delete-all-expressions" onClick={()=>{this.deleteRecordExpressionsChecked()}}>Supprimer les éléments sélectionnés</button>
+          <input type="text" placeholder="Rechercher" id="input-filter-record-expressions" value={this.state.inputFilterRecordExpressions} onChange={()=>{this.setState({inputFilterRecordExpressions: $('#input-filter-record-expressions').val()})}}/>
         </div>
-        <div className="block-record-expression-list" style={{paddingBottom: '30px', height: ($(window).height()-425)+'px'}}>
+        <div className="block-record-expression-list" style={{paddingBottom: '30px', height: ($(window).height()-300)+'px'}}>
           {rcs.map( (record_expression, index) => {
 
             let bgc = 'transarent'
@@ -343,13 +344,15 @@ export default class ExpressionList extends Component {
               bgc = 'transarent'
             }
             return <div className="container-record-expression-list c-e-l-record_expressions" key={index} data-id_record_expression={record_expression.id_record_expression} style={{backgroundColor: bgc}} onClick={()=>{this.selectRecordExpression(record_expression)}}>
-                      <span style={{fontWeight: 'bold', fontSize: '21px', display: 'inline-block', width: '40%'}}>{ucFirst(record_expression.english_value)}</span>
-                      <span style={{fontWeight: 'bold', fontSize: '21px', display: 'inline-block', width: '40%'}}>{(record_expression.user_value == null ? ucFirst(record_expression.french_value) : record_expression.user_value)}</span>
-                      <div style={{float: 'right'}}>
+                      <div className="bloc-expression-traduction-list">
+                        <span className="english-expression-list">{ucFirst(record_expression.english_value)}</span>
+                        <span className="french-expression-list">{(record_expression.user_value == null ? ucFirst(record_expression.french_value) : record_expression.user_value)}</span>
+                      </div>
+                      <div className="bloc-actions-expression-list" style={{float: 'right'}}>
                         <button className="close" aria-label="Close" style={{height: '100%', width: '24px'}} onClick={(e)=>{e.stopPropagation();this.msgDeleteRecordExpression(record_expression)}}>
                           <span aria-hidden="true">×</span>
                         </button>
-                        <input type="checkbox" data-id_record_expression={record_expression.id_record_expression} className="checkbox-record-expression" aria-label="Checkbox for following text input" onClick={(e)=>{e.stopPropagation();this.selectCheckbox(record_expression.id_record_expression)}} style={{ marginTop: '6px', marginRight: '30px'}}></input>
+                        <input type="checkbox" data-id_record_expression={record_expression.id_record_expression} className="checkbox-record-expression" aria-label="Checkbox for following text input" onClick={(e)=>{e.stopPropagation();this.selectCheckbox(record_expression.id_record_expression)}}></input>
                       </div>
                   </div>
           })}
@@ -369,7 +372,7 @@ export default class ExpressionList extends Component {
               {record_expressions}
             </div>
             <div className="col-sm-6">
-              <div style={{marginTop: '10px', paddingTop: '50px', height: ($(window).height()-141)+'px', boxShadow: '0px 0px 10px 0px #c5c5c5'}}>
+              <div style={{marginTop: '10px', paddingTop: '50px', height: ($(window).height()-120)+'px', boxShadow: '0px 0px 10px 0px #c5c5c5'}}>
                 <div style={{width: '75%', margin:'auto', display: displayEditRecordExpression}}>
                   <div style={{height: '200px', fontSize: '40px', fontWeight: 'bold'}}>{ucFirst(this.state.record_expression_selected.english_value)}</div>
                   <textarea id="french-value-record-expression" style={{border: '0px', boxShadow: '0px 0px 10px 0px #c5c5c5', height: '150px', fontSize: '40px', fontWeight: 'bold'}} value={(this.state.record_expression_selected.user_value == null ? ucFirst(this.state.record_expression_selected.french_value) : this.state.record_expression_selected.user_value)} onChange={()=>{

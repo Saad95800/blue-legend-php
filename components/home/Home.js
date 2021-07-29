@@ -24,6 +24,7 @@ export default class Home extends Component {
       }
 
       insertLog(axios, 8, 1)
+      this.props.setColorNavItem('accueil')
 
     }
 
@@ -61,47 +62,7 @@ export default class Home extends Component {
                   </div>
                 </Row>
                 <Row style={{marginTop: '20px'}}>
-                  <Col sm="8">
-                    <div className="home-block-today">
-                      <Row>
-                        <div className="text-center" style={{fontSize: '30px', fontWeight: 'bold', width: '100%'}}>Séries du jour</div>
-                      </Row>
-                      <Row style={{marginTop: '20px'}}>
-                            <Col sm="4">
-                              <div className="text-center home-font-subtitles">A faire</div>
-                              <div className="text-center home-box-series">{this.state.nbSeriesToday}</div>
-                            </Col>
-                            <Col sm="4">
-                              <div className="text-center home-font-subtitles">Faites</div>
-                              <div className="text-center home-box-series">{this.state.nbSerieRealiseesToday}</div>
-                            </Col>
-                            <Col sm="4">
-                              <div className="text-center home-font-subtitles">Mots Appris</div>
-                              <div className="text-center home-box-series">{this.state.nbMotsExprApprisToday}</div>
-                            </Col>             
-                      </Row>
-                    </div>                    
-                  </Col>
-                  <Col sm="4">
-                      <div className="home-block-total">
-                        <Row>
-                          <div className="text-center" style={{fontSize: '30px', fontWeight: 'bold', width: '100%'}}>Total</div>
-                        </Row>
-                        <Row  style={{marginTop: '20px'}}>
-                          <Col sm="6" style={{paddingLeft: '0px', paddingRight: '0px'}}>
-                            <div className="text-center home-font-subtitles-total">Séries réalisées</div>
-                            <div className="text-center" style={{fontSize: '30px', fontWeight:'bold'}}>{this.state.nbSeriesTotalRealisees}</div>
-                          </Col>
-                          <Col sm="6" style={{paddingLeft: '0px', paddingRight: '0px'}}>
-                            <div className="text-center home-font-subtitles-total">Mots Appris</div>
-                            <div className="text-center" style={{fontSize: '30px', fontWeight:'bold'}}>{this.state.nbMotsExprTotalAppris}</div>
-                          </Col>
-                        </Row>
-                      </div>
-                  </Col>
-                </Row>
-                <Row style={{marginTop: '20px'}}>
-                  <Col sm="6">
+                  <Col xs="6">
                     <Link to={'/texte-liste'} className="home-item-nav home-item-nav-lecture">
                       <div className="home-title-nav home-title-nav-lecture text-center">Lecture</div>
                       <div className="home-logo-item home-logo-item-lecture"></div>
@@ -119,11 +80,51 @@ export default class Home extends Component {
                       <div className="home-logo-item home-logo-item-custom"></div>
                     </Link>
                   </Col> */}
-                  <Col sm="6">
+                  <Col xs="6">
                     <Link to={'/revision'} className="home-item-nav home-item-nav-revision">
                       <div className="home-title-nav home-title-nav-revision text-center">Révision</div>
                       <div className="home-logo-item home-logo-item-revision"></div>
                     </Link>
+                  </Col>
+                </Row>
+                <Row style={{marginTop: '20px'}}>
+                  <Col sm="8">
+                    <div className="home-block-today">
+                      <Row>
+                        <div className="text-center" style={{fontSize: '30px', fontWeight: 'bold', width: '100%'}}>Séries du jour</div>
+                      </Row>
+                      <Row style={{marginTop: '20px'}}>
+                            {/* <Col sm="4">
+                              <div className="text-center home-font-subtitles">Planifiées</div>
+                              <div className="text-center home-box-series">{this.state.nbSeriesToday}</div>
+                            </Col> */}
+                            <Col xs="6">
+                              <div className="text-center home-font-subtitles">Réalisées</div>
+                              <div className="text-center home-box-series">{this.state.nbSerieRealiseesToday}</div>
+                            </Col>
+                            <Col xs="6">
+                              <div className="text-center home-font-subtitles">Mots/Expr Appris</div>
+                              <div className="text-center home-box-series">{this.state.nbMotsExprApprisToday}</div>
+                            </Col>             
+                      </Row>
+                    </div>                    
+                  </Col>
+                  <Col sm="4">
+                      <div className="home-block-total">
+                        <Row>
+                          <div className="text-center" style={{fontSize: '30px', fontWeight: 'bold', width: '100%'}}>Total</div>
+                        </Row>
+                        <Row  style={{marginTop: '20px'}}>
+                          <Col xs="6" style={{paddingLeft: '0px', paddingRight: '0px'}}>
+                            <div className="text-center home-font-subtitles-total">Séries réalisées</div>
+                            <div className="text-center" style={{fontSize: '30px', fontWeight:'bold'}}>{this.state.nbSeriesTotalRealisees}</div>
+                          </Col>
+                          <Col xs="6" style={{paddingLeft: '0px', paddingRight: '0px'}}>
+                            <div className="text-center home-font-subtitles-total">Mots Appris</div>
+                            <div className="text-center" style={{fontSize: '30px', fontWeight:'bold'}}>{this.state.nbMotsExprTotalAppris}</div>
+                          </Col>
+                        </Row>
+                      </div>
                   </Col>
                 </Row>
               </Container>
