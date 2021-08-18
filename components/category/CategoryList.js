@@ -36,7 +36,7 @@ export default class CategoryList extends Component {
 
     let categories = this.state.categories.map((category, index) => {
       let categoryName = category.name_category.length > 20 ? category.name.substring(0, 20)+'...' : category.name_category;
-        return  <div key={index}>
+        return  <div className="col-sm-1" key={index}>
                   <Link
                     to={'/categorie-edit/'+category.id_category}
                     className={this.props.classItem}

@@ -10338,10 +10338,30 @@ body {
 .contact-section .social a:active {
   color: #fff;
 }
-
 .footer {
   padding: 5rem 0;
 }
-/* .body-iframe-pdf{
-  transform-origin: center 165px;
-} */
+::selection{
+  background: #8cadff5c;
+}
+::-moz-selection{
+  background: #8cadff5c;
+}
+.word-text-page{
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+.word-text-page:hover{
+  background-color: blue;
+}
+.trad-word{
+  padding: 5px 10px;
+  border: 1px solid 6e6e6;
+  z-index:1;
+  display:none;
+  position:absolute;
+  min-width: 60px;
+  height: 25px;
+  background-color:white;
+}

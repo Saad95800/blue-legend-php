@@ -32,6 +32,8 @@ define('DB_USER',$config->get('db_user'));
 define('DB_PASSWORD',$config->get('db_pswd'));
 define('DB_PORT',$config->get('db_port'));
 
+ini_set('upload_max_filesize', '7M');
+
 function debug($value, $die = true, $type = 1) {
 
     if ($type == 1) {

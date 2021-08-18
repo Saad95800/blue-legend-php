@@ -12,3 +12,20 @@ $controllerClassName = "App\\controller\\$controllerName"; // appelle le control
 $class = new ReflectionClass($controllerClassName);
 $router->executeMethod($methodName, $class);
 die;
+
+// $destinataire = "s.rajraji@yahoo.com";
+// $objet        = "Object";
+// $content      = "<b>Hello world !</b>";
+ 
+// $headers  = "";
+// $headers .= "From: rs.mailpro@gmail.com\n";
+// $headers .= "MIME-version: 1.0\n";
+// $headers .= "Content-type: text/html; charset=utf-8\n";
+ 
+// $result = mail($destinataire, $objet, $content, $headers);
+ 
+// if( !$result ){
+//     echo "L'envoi du mail a échoué";
+// }
+
+// var_dump($result);

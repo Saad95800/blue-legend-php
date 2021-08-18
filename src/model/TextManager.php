@@ -244,7 +244,7 @@ class TextManager extends Model {
 
             $this->dbh->beginTransaction();
 
-            $sql = "SELECT * FROM bl_text WHERE fk_id_user = :id_user";
+            $sql = "SELECT * FROM bl_text WHERE fk_id_user = :id_user OR ISNULL(fk_id_user)";
 
             $req = $this->dbh->prepare($sql);
             $req->bindValue(':id_user', $id_user);

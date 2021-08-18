@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import {capitalizeFirstLetter, limit15str, ucFirst, insertLog} from './../functions';
-import {root} from './../setup'
+import {capitalizeFirstLetter, limit15str, ucFirst, insertLog} from '../functions';
+import {root} from '../setup'
 
-export default class ExpressionList extends Component {
+export default class TextListFilter extends Component {
 
   constructor(props){
     super(props);
@@ -20,10 +20,7 @@ export default class ExpressionList extends Component {
       record_expression_selected: [],
       displayPopupDeleteRecordExpression: 'none',
       id_record_expression_to_delete: '',
-      record_expression_checked: [],
-      c_e_l_text_bgcolor: 'transparent',
-      c_e_l_serie_bgcolor: 'transparent',
-      c_e_l_record_expressions_bgcolor: 'transparent'
+      record_expression_checked: []
     }
 
     insertLog(axios, 7, 1)
@@ -79,20 +76,12 @@ export default class ExpressionList extends Component {
   }
 
   selectText(id_text){
-    // $('.c-e-l-text').css('background-color', 'transparent')
-    // $('.c-e-l-serie').css('background-color', 'transparent')
-    // $('.c-e-l-record_expressions').css('background-color', 'transparent')
+    $('.c-e-l-text').css('background-color', 'transparent')
+    $('.c-e-l-serie').css('background-color', 'transparent')
+    $('.c-e-l-record_expressions').css('background-color', 'transparent')
     if(id_text == this.state.id_text_selected){
-      console.log('Même texte')
-      this.setState({id_text_selected: '', 
-                     id_serie_selected: '', 
-                     id_record_expression_selected: '',
-                     c_e_l_text_bgcolor: 'transparent',
-                    //  c_e_l_serie_bgcolor: 'transparent',
-                    //  c_e_l_record_expressions_bgcolor: 'transparent'
-                   })
+      this.setState({id_text_selected: '', id_serie_selected: '', id_record_expression_selected: ''})
     }else{
-      console.log('Autre texte')
       this.setState({id_text_selected: id_text, id_serie_selected: '', id_record_expression_selected: ''})
     }
   }
@@ -248,7 +237,7 @@ export default class ExpressionList extends Component {
 
     let displayEditRecordExpression = 'none'
     if(this.state.id_record_expression_selected != ''){
-      displayEditRecordExpression = 'flex'
+      displayEditRecordExpression = 'block'
     }
     //////////////////////////////////////// Texts
 
@@ -260,7 +249,7 @@ export default class ExpressionList extends Component {
         {this.state.textes.map( (text, index) => {
 
           let cssItem = {width: '30px', height: '30px', margin: 'auto', background: 'url('+root+'public/img/main_img.png) -15px -81px   no-repeat'}
-          let bgc = this.state.c_e_l_text_bgcolor
+          let bgc = 'transarent'
           if(text.id_text == this.state.id_text_selected){
             bgc = '#dde6ff'
           }else{
@@ -292,7 +281,7 @@ export default class ExpressionList extends Component {
         {s.map( (serie, index) => {
 
           let cssItem = {width: '30px', height: '30px', margin: 'auto', background: 'url('+root+'public/img/main_img.png) -45px -81px    no-repeat'}
-          let bgc = this.state.c_e_l_serie_bgcolor
+          let bgc = 'transarent'
           if(serie.id_serie == this.state.id_serie_selected){
             bgc = '#dde6ff'
           }else{
@@ -348,7 +337,7 @@ export default class ExpressionList extends Component {
         <div className="block-record-expression-list" style={{paddingBottom: '30px', height: ($(window).height()-300)+'px'}}>
           {rcs.map( (record_expression, index) => {
 
-            let bgc = this.state.c_e_l_record_expressions_bgcolor
+            let bgc = 'transarent'
             if(record_expression.id_record_expression == this.state.id_record_expression_selected){
               bgc = '#dde6ff'
             }else{
@@ -384,7 +373,7 @@ export default class ExpressionList extends Component {
             </div>
             <div className="col-sm-6">
               <div style={{marginTop: '10px', paddingTop: '50px', height: ($(window).height()-120)+'px', boxShadow: '0px 0px 10px 0px #c5c5c5'}}>
-                <div style={{width: '75%', margin:'auto', display: displayEditRecordExpression, flexDirection: 'column'}}>
+                <div style={{width: '75%', margin:'auto', display: displayEditRecordExpression}}>
                   <div style={{height: '200px', fontSize: '40px', fontWeight: 'bold'}}>{ucFirst(this.state.record_expression_selected.english_value)}</div>
                   <textarea id="french-value-record-expression" style={{border: '0px', boxShadow: '0px 0px 10px 0px #c5c5c5', height: '150px', fontSize: '40px', fontWeight: 'bold'}} value={(this.state.record_expression_selected.user_value == null ? ucFirst(this.state.record_expression_selected.french_value) : this.state.record_expression_selected.user_value)} onChange={()=>{
                     let new_record_expression_selected = this.state.record_expression_selected

@@ -838,11 +838,15 @@ function limit20str(str) {
 }
 
 function limit15str(str) {
-  return str.length > 15 ? str.substring(0, 15) + '...' : str;
+  if (str != undefined && str != null) {
+    return str.length > 15 ? str.substring(0, 15) + '...' : str;
+  }
+
+  return '';
 }
 
 function replaceSpecialChar(str) {
-  return str.replaceAll("&amp;", "&").replaceAll("&gt;", ">").replaceAll("&lt;", "<").replaceAll("&quot;", '"').replaceAll("&#39;", "'");
+  return str.replaceAll("&amp;", "&").replaceAll("&gt;", ">").replaceAll("&lt;", "<").replaceAll("&quot;", '"').replaceAll("&#39;", "'").replaceAll('é', 'e').replaceAll('à', 'a').replaceAll('ù', 'u').replaceAll('ç', 'c').replaceAll('è', 'e').replaceAll('î', 'i').replaceAll('û', 'u').replaceAll('ï', 'i');
 }
 
 function isURL(str) {

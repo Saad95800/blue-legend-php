@@ -406,6 +406,27 @@ class SerieManager extends Model {
                 $retour = false;
             }
 
+            if($retour){
+                $sql = "SELECT COUNT(*) as nb FROM bl_record_expression WHERE fk_id_serie = :id_serie AND deleted = 0";
+
+                $req = $this->dbh->prepare($sql);
+                $req->bindValue(':id_serie', $data['id_serie']);
+                $req->execute();
+                $nb = $req->fetch(\PDO::FETCH_ASSOC)['nb'];
+
+                if(intval($nb) == intval($data['score'])){
+                    $sql = "UPDATE bl_serie SET completed = 1 WHERE id_serie = :id_serie";
+                    $req = $this->dbh->prepare($sql);
+                    $req->bindValue(':id_serie', $data['id_serie']);
+                    $result = $req->execute();
+                    if($result){
+                        $retour = true;
+                    }else{
+                        $retour = false;
+                    }
+                }                
+            }
+
             $this->dbh->commit();
 
             

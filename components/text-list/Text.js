@@ -24,7 +24,9 @@ export default class Text extends Component {
       type_text: '',
       active_page: 1,
       heightContainerIframePdf: '500px',
-      zoom: 0.4,
+      heightContainerIframeLink: '500px',
+      heightContainerIframeText: '500px',
+      zoom: 0.3,
       left: 0,
       fullSreenPdf: false,
       file_name_server: '',
@@ -70,23 +72,21 @@ export default class Text extends Component {
   }
 
   componentDidMount(){
-    // console.log('componentDidMount')
-    // console.log($("#container-iframe-pdf"))
-    // console.log(($(window).height()-130)+'px')
 
-    let zoom = 0.4
+    let zoom = 0.3
     if(window.screen.width > 600){
-      zoom = 1
+      zoom = 0.9
     }
 
     this.setState({
-      // heightContainerIframePdf: ($(window).height()-120)+'px',
+      heightContainerIframePdf: (window.screen.height-270) +'px',
+      heightContainerIframeText: (window.screen.height-380) +'px',
+      heightContainerIframeLink: (window.screen.height-20) +'px',
       heightIframePdf: '1291px',
       zoom: zoom
     })
     $('#iframe-pdf').css('height', ($(window).height()-380)+'px')
-
-
+    
   }
 
   changePage(action){
@@ -136,7 +136,7 @@ export default class Text extends Component {
     let zoom = 1
     let left = 0
     if(window.screen.width < 600) {
-      zoom = 0.4
+      zoom = 0.3
       if(this.state.left > 0){
         left = this.state.left - 45
       }else{
@@ -186,7 +186,7 @@ export default class Text extends Component {
         'top': '0px',
         'left': '0px',
         'z-index': '1',
-        'width': window.screen.width,
+        'width': '100%',
         'max-height': '100%',
         'overflow-y': 'scroll'
       })
@@ -228,7 +228,7 @@ export default class Text extends Component {
                           data-textcontent={this.state.contentTextArea}
                           data-textid={this.state.texte.id_text}
                           src={src}
-                          style={{width: '100%', height: '1000px'}}
+                          style={{width: '100%', height: this.state.heightContainerIframeText}}
                         ></iframe>                        
                       </div>
 
@@ -251,7 +251,13 @@ export default class Text extends Component {
           <div className="container-btn-page">
             <div id="btn-page-previous"  className="arrow-btn-page" onClick={() => { this.changePage('previous')}} ></div>
             <div id="btn-page-next"  className="arrow-btn-page" onClick={() => { this.changePage('next')}} ></div>
-            <div id="view-active-page" data-active_page={this.state.active_page}>{this.state.active_page} / {this.state.texte.nb_page}</div>
+            <div id="view-active-page" data-active_page={this.state.active_page}> <input type="text" id="input-active-page" value={this.state.active_page} onChange={()=>{
+                
+                if( (parseInt($('#input-active-page').val()) <= this.state.texte.nb_page) && (parseInt($('#input-active-page').val()) > 0) && Number.isInteger(parseInt($('#input-active-page').val())) ){
+                  console.log('ok')
+                  this.setState({active_page: $('#input-active-page').val()})
+                }
+              }} style={{display: 'inline-block', width: '60px'}} /> / {this.state.texte.nb_page}</div>
             <div id="pdf-zoom-out" onClick={() => {this.zoonOut()}}></div>
             <div id="pdf-zoom-in" onClick={() => {this.zoonIn()}}></div>
           </div>
@@ -274,7 +280,7 @@ export default class Text extends Component {
 
         let src = root+'public/uploads/links/'+fnsl;
         text = 
-        <div id="container-iframe-pdf" style={{height: this.state.heightContainerIframePdf}}>
+        <div id="container-iframe-link" style={{height: this.state.heightContainerIframeLink}}>
           <iframe
             className="iframe-link" 
             id="iframe-pdf" 

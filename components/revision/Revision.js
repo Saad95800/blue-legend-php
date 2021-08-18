@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import TextListRevision from './TextListRevision';
 import SerieListRevision from './SerieListRevision';
 import ContentRevision from './ContentRevision';
@@ -30,6 +31,7 @@ export default class Revision extends Component {
       num_content: this.props.location.pathname.split("/")[7],
       num_mode: this.props.location.pathname.split("/")[9],
       serie: serie,
+      previous_link: this.props.pathname,
       id_serie: id_serie,
       infos_content: {
         "1": "Mots",
@@ -65,6 +67,7 @@ export default class Revision extends Component {
           data: formdata
         })
         .then((response) => {
+          localStorage.setItem('url-serie', this.props.location.pathname)
           this.setState({textes: response.data});
         })
         .catch( (error) => {
@@ -82,7 +85,10 @@ export default class Revision extends Component {
           data: formdata
         })
         .then((response) => {
-          this.setState({series: response.data});
+          this.setState({
+            series: response.data, 
+            previous_link: '/revision'
+          });
         })
         .catch( (error) => {
           console.log(error);
@@ -94,10 +100,50 @@ export default class Revision extends Component {
         let id_texte = url[3];
         let id_serie = url[5];
         let num_content = url[7];
-        this.setState({id_texte: id_texte, id_serie: id_serie, num_content: num_content});
+        formdata.append('id_texte', id_texte)
+        formdata.append('id_serie', id_serie)
+        axios({
+          method: 'post',
+          url: '/get-serie-by-id-ajax',
+          responseType: 'json',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          data: formdata
+        })
+        .then((response) => {
+          this.setState({
+            serie: response.data,
+            id_texte: id_texte, 
+            id_serie: id_serie, 
+            num_content: num_content, 
+            previous_link: `/revision-serie-list/text/${id_texte}`
+          });
+        })
+        .catch( (error) => {
+          console.log(error);
+        });
+
+
       }else if(this.props.step == 'btn-begin'){
+        let id_texte = url[3];
+        let id_serie = url[5];
         let num_content = url[7];
         let num_mode = url[9];
+
+        this.setState({
+          id_texte: id_texte, 
+          num_content: num_content, 
+          num_mode: num_mode,
+          id_serie: id_serie, 
+          previous_link: `/revision-mode/texte/${id_texte}/serie/${id_serie}/content/1`
+        });
+      }else if(this.props.step == 'serie'){
+        let id_texte = url[3];
+        let id_serie = url[5];
+        let num_content = url[7];
+        let num_mode = url[9];
+
         formdata.append('id_text', url[3])
         formdata.append('id_serie', url[5])
         axios({
@@ -110,17 +156,20 @@ export default class Revision extends Component {
           data: formdata
         })
         .then((response) => {
-          this.setState({id_texte: id_texte, num_content: num_content, num_mode: num_mode, serie: response.data, id_serie: id_serie});
+          this.setState({
+            id_texte: id_texte, 
+            id_serie: id_serie, 
+            serie: response.data,
+            num_content: num_content, 
+            num_mode: num_mode, 
+            previous_link: `/revision-serie-list/text/${id_texte}`
+          });
         })
         .catch( (error) => {
           console.log(error);
         });
-      }else if(this.props.step == 'serie'){
-        let id_texte = url[3];
-        let id_serie = url[5];
-        let num_content = url[7];
-        let num_mode = url[9];
-        this.setState({id_texte: id_texte, id_serie: id_serie, num_content: num_content, num_mode: num_mode});
+
+
       }
 
   }
@@ -140,7 +189,7 @@ export default class Revision extends Component {
                     </div>;
         break;
       case 'serie-list':
-        contentStep = <SerieListRevision data={{'series': this.state.series}}/>;
+        contentStep = <SerieListRevision data={{'textes': this.state.textes, 'series': this.state.series}}/>;
         infos = <div className="text-center font-infos-revision">Quel série souhaitez-vous réviser ?</div>;
         stepsIcons = <div className="flex-column" style={{alignItems: 'center', position: 'fixed', top: '117px', left: '70px'}}>
                       <span className="img-icone-revision-texte"></span>
@@ -177,7 +226,7 @@ export default class Revision extends Component {
         infos = '';
         break;
       case 'serie':
-        contentStep = <SerieRevision data={this.props} num_mode={this.state.num_mode} id_texte={this.state.id_texte}/>;
+        contentStep = <SerieRevision data={this.props} num_mode={this.state.num_mode} serie={this.state.serie} id_texte={this.state.id_texte}/>;
         infos = '';
         stepsIcons = <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'fixed', top: '117px', left: '70px'}}>
                         <span className="img-icone-revision-texte"></span>
@@ -192,6 +241,12 @@ export default class Revision extends Component {
         break;
     }
 
+    let previous_link_btn = ''
+    if(this.state.step != 'text-list'){
+      previous_link_btn = <div>
+                        <Link to={this.state.previous_link} className="btn">Retour</Link>
+                      </div>
+    }
     return (
       <div className="container-page container-revision">
         <Row>
@@ -199,11 +254,12 @@ export default class Revision extends Component {
             REVISION
           </div>
         </Row>
+          {previous_link_btn}
         <Row>
           <div className="hidden-xs col-sm-2" style={{position: 'absolute'}}>
             {/* {stepsIcons} */}
           </div>
-          <Col xs="12" sm="10" style={{width: '100%'}}>
+          <Col xs="12" style={{width: '100%'}}>
             <Row style={{marginTop: '20px'}}>
               {infos}
             </Row>

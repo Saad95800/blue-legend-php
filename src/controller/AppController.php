@@ -38,6 +38,7 @@ class AppController extends Controller {
     }
     public function indexaction(){
 
+        // phpinfo();
         $auth = new AuthenticationController();
         if(!$auth->is_connected()){
             header('location: /');
@@ -112,7 +113,11 @@ class AppController extends Controller {
 
         $um = new UserManager();
 
-        $user = $um->getUserById($_SESSION['id_user']);
+        $user = [];
+        if(isset($_SESSION['id_user'])){
+            $id_user = $_SESSION['id_user'];
+            $user = $um->getUserById($id_user);
+        }
 
         echo json_encode($user);
         die;
@@ -231,6 +236,9 @@ class AppController extends Controller {
 
     public function saveTextAjax(){
 
+        // $fi = new \FilesystemIterator(ROOT.'public'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.$_POST['id_file'].DIRECTORY_SEPARATOR.'html', FilesystemIterator::SKIP_DOTS);
+        // printf("There were %d Files", iterator_count($fi));
+        // die;
         $tm = new TextManager();
 
         $nbpage = 0;
@@ -331,6 +339,7 @@ class AppController extends Controller {
     
     public function uploadFilePdfAjax(){
 
+        // debug($_FILES);
         $msg = 'Echec lors du chargement du fichier';
         $file = [];
 
@@ -357,7 +366,8 @@ class AppController extends Controller {
         }
 
         $result = move_uploaded_file($_FILES["file"]["tmp_name"], $target_file);
-
+// debug($result);
+// die('toto');
         if($result == 1){
             $msg = 'Fichier chargé avec succès !';
             $file = [
@@ -377,6 +387,12 @@ class AppController extends Controller {
                 null,
                 ['bypass_shell' => true]
             );
+            // debug(proc_get_status($process), false);
+            // debug($pipes);
+            // $stderr = stream_get_contents($pipes[2]);
+            // fclose($pipes[2]);
+            proc_close($process);
+
             // var_dump(proc_get_status($process));die('toto');
             $error = false;
         }else{

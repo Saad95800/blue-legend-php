@@ -11,7 +11,7 @@ export default class serieRevision extends Component {
     this.timer = 0;
     this.durationCount = 5;
     
-    this.state = {  
+    this.state = {
       id_histoserie: 0,
       numQuestion: 0,
       inputResponse: '',
@@ -78,7 +78,7 @@ export default class serieRevision extends Component {
   validate(){
     this._handleStopClick();
     if(this.state.stepRev == 'Question'){
-      let res = replaceSpecialChar(this.state.expressions[this.state.numQuestion].french_value.toLowerCase().trim()) == replaceSpecialChar(document.querySelector("#inputResponse").value.toLowerCase().trim());
+      let res = (replaceSpecialChar(this.state.expressions[this.state.numQuestion].french_value.toLowerCase().trim()) == replaceSpecialChar(document.querySelector("#inputResponse").value.toLowerCase().trim()) );
       let last = (this.state.numQuestion == this.state.expressions.length - 1);
       let msg = "Suivant";
       if(last){
@@ -321,9 +321,11 @@ update(millis, seconds, minutes) {
 
     }
     return (
-            <div>
+            <div style={{width: '100%'}}>
+                
                 <div id="clock" style={{position: 'fixed', top: '78px', right: '80px'}}>{clock}</div>
-                <div style={styles.blockSerie}>
+                <div style={{width: '80%', margin: 'auto'}}>{this.props.serie.name_serie}</div>
+                <div className="block-serie">
                   <div style={{display: displayExo}}>
                     <div style={{paddingTop: "35px",textAlign: "center",fontWeight: "bold",fontSize: "30px"}}>{capitalizeFirstLetter(text)}</div>
                     <div style={{textAlign: "center"}}>
@@ -364,17 +366,5 @@ update(millis, seconds, minutes) {
             </div>
     );
 
-  }
-}
-
-let styles = {
-  blockSerie: {
-    width: "60%",
-    minWidth: "600px",
-    height: "400px",
-    backgroundColor: "#FFFBF1",
-    borderRadius: "10px",
-    border: "1px solid #c7c7c7",
-    marginTop: "30px"
   }
 }
